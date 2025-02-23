@@ -8,5 +8,5 @@ export type Token = {
 export type Node = {
     type: string;
     value: string;
-    children: Node[];
+    children?: Node[];
 }

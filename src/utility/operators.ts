@@ -5,5 +5,11 @@ export const operators = {
     carriageReturn: [/\r/],
     formFeed: [/\f/],
     verticalTab: [/\v/],
-    assign: [/\=/, /\→/]
+    assign: [/\=/, /\→/],
+    quote: [/\"/, /\'/],
+    comma: [/\,/],
+    add: [/\+/],
+    subtract: [/\-/],
+    multiply: [/\*/],
+    divide: [/\//]
 }
