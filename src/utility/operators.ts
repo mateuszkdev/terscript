@@ -1,4 +1,9 @@
 export const operators = {
-    space: [/\\t/, /\\n/, /\\r/, /\\f/, /\\v/, /\\s/],
+    space: [/\s/],
+    tab: [/\t/],
+    enter: [/\n/],
+    carriageReturn: [/\r/],
+    formFeed: [/\f/],
+    verticalTab: [/\v/],
     assign: [/\=/, /\→/]
 }
