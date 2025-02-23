@@ -1,8 +1,8 @@
-import { Token } from 'types/Parser';
+import { Token, Node } from 'types/Parser';
 
 export type StorageVariableCell = {
     name: string;
-    value: Token;
+    value: Token | Node;
 }
 
 export type StorageType = Map<string, StorageVariableCell>;

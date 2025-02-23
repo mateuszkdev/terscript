@@ -1,17 +1,24 @@
 /**
  * IMPORTS
  */
-
-/* DEV SETTER */
 import flags from './modules/flags';
-export const isDev = flags.dev;
+export const isDev = flags.dev; // dev setter
+
+import { Storage } from './modules/storage';
+import { Functions } from './modules/functions';
 
 import load from './modules/loader';
+
+
+/**
+ * CONSTANTS
+ */
+export const STORAGE = new Storage();
+export const FUNCTIONS = new Functions();
 
 /**
  * INTERPRETER
  */
-
 import Lexer from './interpreter/lexer';
 import Parser from './interpreter/parser';
 
