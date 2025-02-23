@@ -2,6 +2,8 @@ import { Token, Node } from '../types/Parser';
 import { operators } from '../utility/operators';
 import { charset } from '../utility/charset';
 
+import String from './parser/string';
+
 /**
  * @name Parser
  * @description The Parser class is responsible for converting the list of tokens into a list of nodes.
@@ -14,6 +16,7 @@ export default class Parser {
     private index: number = -1;
     private current: Token = { type: 'undefined', value: '', line: 0, index: 0 };
     private node: Node = { type: 'undefined', value: '', children: [] };
+    private lastToken: Token = { type: 'undefined', value: '', line: 0, index: 0 };
 
     public tree: Node[] = [];
 
@@ -36,7 +39,10 @@ export default class Parser {
         this.index = -1;
 
         // Loop through the tokens for parsing
-        while(this.power) this.tree.push(this.parse() as Node);
+        while(this.power) {
+            this.node = this.parse() as Node;
+            this.tree.push(this.node);
+        }
 
     }
 
@@ -47,30 +53,83 @@ export default class Parser {
      */
     private parse(): Node | boolean {
 
-        this.current = this.tokens[++this.index];
+        if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') return this.power = false;
+        if (this.checkNextToken.type == 'space' || this.checkNextToken.type == 'tab' || this.checkNextToken.type == 'enter') { this.next(); return this.parse()}
 
-        if (typeof this.current == 'undefined' || typeof this.current == 'boolean') return this.power = false;
+        this.lastToken = this.current
+        this.current = this.next();
 
-        else if (this.current.type == 'space' || this.current.type == 'tab' || this.current.type == 'enter') return this.parse();
-        else if (this.current.type == 'quote') return this.parseString();
-        // else if (this.current.type == 'assign') return this.parseAssign();
+        if (this.current.type == 'quote') return this.parseString();
+        else if (this.current.type == 'assign') return this.parseAssign();
         // else if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseOperation();
         // else if (this.current.type == 'identifier') return this.parseIdentifier();
         else return this.parse();
 
     }
 
+    /**
+     * @name parseString
+     * @description The parseString method is responsible for parsing the string token.
+     * @returns {Node} Parsed String
+     */
     private parseString(): Node {
 
-        let value = '';
-        this.current = this.tokens[++this.index];
+        const string = new String(this.scaleTokens());
+        this.updateIndex(string.index);
+        return { type: 'string', value: string.value, children: [] };
 
-        while (this.current.type != 'quote') {
-            value += this.current.value;
-            this.current = this.tokens[++this.index];
-        }
+    }
 
-        return { type: 'string', value: value, children: [] };
+    /**
+     * @name parseAssign
+     * @description The parseAssign method is responsible for parsing the assign token.
+     * @returns {Node} Parsed Assign
+     */
+    private parseAssign(): Node {
+
+        return { type: 'assign', value: '=', children: [this.lastToken, this.parse() as Token] };
+
+    }
+
+    /**
+     * @name scaleTokens
+     * @description The scaleTokens method is responsible for scaling the tokens.
+     * @returns {Token[]} The scaled tokens.
+     */
+    private scaleTokens(): Token[] {
+        return this.tokens.slice(this.index);
+    }
+
+    /**
+     * @name updateIndex
+     * @description The updateIndex method is responsible for updating the index.
+     * @param {number} i The number to add to the index. 
+     * @returns {void}
+     */
+    private updateIndex(i: number): void {
+        this.index += (i + 0);
+    }
+
+    /**
+     * @name checkNextToken
+     * @description The checkNextToken method is responsible for checking the next token.
+     * @returns {Token} The next token.
+     */
+    private get checkNextToken(): Token {
+        return this.tokens[this.index + 1];
+    }
+
+    /**
+     * @name next
+     * @description The next method is responsible for returning the next token in the code.
+     * @param {number} i Number to add to the index ( default 0 ) 
+     * @returns 
+     */
+    private next(i: number = 0): Token { // can't be used in split method because it will skip space etc.
+
+        let next = this.tokens[this.index + (1 + i)];
+        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter') return this.next(1);
+        else return this.tokens[++this.index];
 
     }
 
