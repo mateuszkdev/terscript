@@ -1,7 +1,7 @@
 import { Token, Node } from '../types/Parser';
 import { STORAGE } from '../index';
 
-export default class Evaluator {
+export class Evaluator {
 
     /* VARIABLES */
     private tree: Node[] = [];

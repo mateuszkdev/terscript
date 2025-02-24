@@ -8,7 +8,7 @@ import { isDev } from '../index';
  * @name Lexer
  * @description The Lexer class is responsible for converting the raw code into a list of tokens.
  */
-export default class Lexer {
+export class Lexer {
 
     /* VARIABLES */
     private code: string[] = [];

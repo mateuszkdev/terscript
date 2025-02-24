@@ -4,12 +4,14 @@
     "description": "Simple interpreter written in TypeScript",
     "main": "build/index.js",
     "scripts": {
-      "test": "node ./build/index.js --file 1 --dev true"
+        "test": "node ./build/index.js --file 1 --dev true"
     },
     "author": "Mateusz4711 (https://github.com/mateuszkdev)",
     "license": "ISC",
     "devDependencies": {
-      "@types/node": "^20.5.1",
-      "concurrently": "^8.2.0"
+        "@ts-docs/default-docs-structure": "^0.4.4",
+        "@ts-docs/ts-docs": "^0.4.4",
+        "@types/node": "^20.5.1",
+        "concurrently": "^8.2.0"
     }
-  }
+}

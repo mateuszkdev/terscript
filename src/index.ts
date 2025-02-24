@@ -19,8 +19,8 @@ export const FUNCTIONS = new Functions();
 /**
  * INTERPRETER
  */
-import Lexer from './interpreter/lexer';
-import Parser from './interpreter/parser';
+import { Lexer } from './interpreter/lexer';
+import { Parser } from './interpreter/parser';
 
 export const code = load(flags.file);
 isDev && console.log(`[DevMode]: Loaded initiation flags: \n ${JSON.stringify(flags)}\n`);

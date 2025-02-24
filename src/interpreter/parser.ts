@@ -8,7 +8,7 @@ import String from './parser/string';
  * @name Parser
  * @description The Parser class is responsible for converting the list of tokens into a list of nodes.
  */
-export default class Parser {
+export class Parser {
 
     /* VARIABLES */
     private power: boolean = true;
