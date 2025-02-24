@@ -29,7 +29,9 @@ export class Functions {
             .forEach(file => {
 
                 const called: Fun = require(`${__dirname}/../interpreter/functions/${file}`).default;
-                this.functions.set(called.name, called);
+                if (!called.methods) throw new Error(`Function ${called.name} does not have any methods.`);
+
+                called.methods.forEach(method => this.functions.set(method.name, called));
 
             });
 

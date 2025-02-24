@@ -4,8 +4,7 @@
     "description": "Simple interpreter written in TypeScript",
     "main": "build/index.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "dev": "concurrently \"tsc --watch\" \"nodemon . --dev true --file test\""
+      "test": "node ./build/index.js --file 1 --dev true"
     },
     "author": "Mateusz4711 (https://github.com/mateuszkdev)",
     "license": "ISC",

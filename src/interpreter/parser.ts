@@ -38,6 +38,8 @@ export default class Parser {
         this.tokens = tmpTokens;
         this.index = -1;
 
+        console.log(this.tokens) // test log
+
         // Loop through the tokens for parsing
         while(this.power) {
             this.node = this.parse() as Node;
@@ -60,11 +62,34 @@ export default class Parser {
         this.current = this.next();
 
         if (this.current.type == 'quote') return this.parseString();
+        else if (this.current.type == 'letters') return { type: 'identifier', value: this.current.value, children: [] }
+        else if (this.current.type == 'numbers') return { type: 'number', value: this.current.value, children: [] }
         else if (this.current.type == 'assign') return this.parseAssign();
+        else if (this.current.type == 'leftParenthesis') return this.parseArguments();
         // else if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseOperation();
-        // else if (this.current.type == 'identifier') return this.parseIdentifier();
         else return this.parse();
 
+    }
+
+    /**
+     * @name parseArguments
+     * @description The parseArguments method is responsible for parsing the arguments.
+     * @returns {Node} Parsed Arguments
+     */
+    private parseArguments(): Node {
+        
+        let args: Node[] = [];
+        let pwr: boolean = true;
+        while (pwr) {
+            if (this.checkNextToken.type == 'rightParenthesis') { this.next(); pwr = false; }
+            if (this.current.type == 'comma') {
+                this.next();
+                args.push(this.parse() as Node)
+            }
+            else args.push(this.parse() as Node);
+        }
+
+        return { type: 'arguments', value: '', children: args };
     }
 
     /**

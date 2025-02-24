@@ -23,7 +23,7 @@ export default class String {
     }
 
     private parse(): void {
-        console.log(this.value)
+        
         this.current = this.tokens[++this.index];
         if (operators.quote.some(r => r.test(this.current.value))) this.power = false;
         else this.value += this.current.value;
