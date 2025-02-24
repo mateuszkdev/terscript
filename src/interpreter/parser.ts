@@ -38,7 +38,7 @@ export class Parser {
         this.tokens = tmpTokens;
         this.index = -1;
 
-        console.log(this.tokens) // test log
+        // console.log(this.tokens) // test log
 
         // Loop through the tokens for parsing
         while(this.power) {
@@ -55,19 +55,34 @@ export class Parser {
      */
     private parse(): Node | boolean {
 
+        /* Check if program should sotp and skipping whitechars */
         if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') return this.power = false;
         if (this.checkNextToken.type == 'space' || this.checkNextToken.type == 'tab' || this.checkNextToken.type == 'enter') { this.next(); return this.parse()}
 
         this.lastToken = this.current
         this.current = this.next();
 
+        /* Checking maths */
+        if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseMath();
+
+        /* Check for the type of token */
         if (this.current.type == 'quote') return this.parseString();
         else if (this.current.type == 'letters') return { type: 'identifier', value: this.current.value, children: [] }
         else if (this.current.type == 'numbers') return { type: 'number', value: this.current.value, children: [] }
         else if (this.current.type == 'assign') return this.parseAssign();
         else if (this.current.type == 'leftParenthesis') return this.parseArguments();
-        // else if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseOperation();
         else return this.parse();
+
+    }
+
+    /**
+     * @name parseMath
+     * @description The parseMath method is responsible for parsing the math token.
+     * @returns {Node} Parsed Math
+     */
+    private parseMath(): Node {
+
+        return { type: 'math', value: this.current.type, children: [this.lastToken, this.parse() as Node] }
 
     }
 
