@@ -1,6 +1,5 @@
-import { Token, Node } from '../types/Parser';
+import { Node } from '../types/Parser';
 import { STORAGE, FUNCTIONS } from '../index';
-import { StorageVariableCell } from 'types/Storage';
 
 /**
  * @name Evaluator
@@ -71,7 +70,7 @@ export class Evaluator {
      * @argument {Node} node The node to identify
      * @returns {void}
      */
-    private identifier(node: Node): any { // @TODO Add type
+    private identifier(node: Node): Node | void {
 
         if (node.type == 'string') return node;
         else if (node.type == 'number') return node;
@@ -90,13 +89,8 @@ export class Evaluator {
 
         const fun = FUNCTIONS.getFunction(this.current.value);
         let args = (this.next() as Node).children!;
-        args = args.map((arg: Node) => this.identifier(arg));
-        fun.run(args.map((arg: any) => {
-            if (arg.type == 'string') return arg.value;
-            else if (arg.type == 'number') return arg.value;
-            else if (arg.name) return arg.value.value;
-            else return arg;
-        }));
+        args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined);
+        fun.run(args.map((arg: Node) => arg.value));
         this.addOutput = `Function "${this.current.value}" called with arguments: ${JSON.stringify(args)}\n`;
 
     }
@@ -107,7 +101,7 @@ export class Evaluator {
      * @argument {Node} node The node to check
      * @returns {void}
      */
-    private itsVariable(node: Node): any { // @TODO Add type
+    private itsVariable(node: Node): Node {
 
         let variable = STORAGE.getVariable(node.value);
         this.addOutput = `Variable "${node.value}" called. Value: ${variable}\n`;

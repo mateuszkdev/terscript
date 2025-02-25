@@ -1,3 +1,4 @@
+import { Node } from 'types/Parser';
 import { StorageType, StorageVariableCell } from '../types/Storage';
 
 /**
@@ -31,10 +32,10 @@ export class Storage {
      * @param {string} name The name of the variable.
      * @returns {StorageVariableCell} The variable.
      */
-    public getVariable(name: string): StorageVariableCell {
+    public getVariable(name: string): Node {
 
         if (!this.memory.has(name)) throw new Error(`Variable ${name} does not exist.`);
-        return this.memory.get(name) as StorageVariableCell;
+        return this.memory.get(name)?.value as Node;
 
     }
 
