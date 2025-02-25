@@ -1,5 +1,5 @@
 import { readdirSync } from 'fs';
-import { Fun } from '../types/Functions';
+import { Fun, Method } from '../types/Functions';
 
 /**
  * @name Functions
@@ -53,9 +53,10 @@ export class Functions {
      * @param {string} name The name of the function.
      * @returns {Fun} The function.
      */
-    public getFunction(name: string): Fun {
-        if (!this.isFunction) throw new Error(`Function ${name} does not exist.`);
-        return this.functions.get(name) as Fun;
+    public getFunction(name: string): Method {
+        const func = this.functions.get(name);
+        if (!func) throw new Error(`Function ${name} does not exist.`);
+        return func.methods.find(method => method.name === name) as Method;
     }
 
 }

@@ -9,7 +9,9 @@ export default {
             name: 'log',
             description: 'Print text in console',
             usage: 'log("Hello, World!")',
-            run: (text: string) => console.log(text)
+            run: (args) => {
+                console.log(...args)
+            }
         }
     ]
 

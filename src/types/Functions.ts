@@ -2,7 +2,7 @@ export type Method = {
     name: string;
     description: string;
     usage?: string;
-    run: (e: unknown) => Promise<any>;
+    run: (e: any) => Promise<any>;
 }
 
 export type Fun = {

@@ -127,6 +127,7 @@ export class Parser {
      */
     private parseAssign(): Node {
 
+        this.tree.pop();
         return { type: 'assign', value: '=', children: [this.lastToken, this.parse() as Token] };
 
     }
