@@ -97,7 +97,7 @@ export class Parser {
         let pwr: boolean = true;
         while (pwr) {
             if (this.checkNextToken.type == 'rightParenthesis') { this.next(); pwr = false; }
-            if (this.current.type == 'comma') {
+            else if (this.current.type == 'comma') {
                 this.next();
                 args.push(this.parse() as Node)
             }

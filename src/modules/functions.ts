@@ -54,9 +54,11 @@ export class Functions {
      * @returns {Fun} The function.
      */
     public getFunction(name: string): Method {
+
         const func = this.functions.get(name);
         if (!func) throw new Error(`Function ${name} does not exist.`);
         return func.methods.find(method => method.name === name) as Method;
+        
     }
 
 }

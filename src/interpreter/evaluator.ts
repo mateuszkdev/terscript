@@ -23,10 +23,11 @@ export class Evaluator {
 
         this.tree = tree;
         
+        // Loop through the tree
         while (this.power) {
 
             if (this.index + 1 >= this.tree.length) this.power = false;
-            this.evaluate();
+            this.evaluate(); 
 
         }
 
@@ -39,12 +40,12 @@ export class Evaluator {
      */
     private next(): Node | boolean {
         
-        if (this.index + 1 >= this.tree.length) return this.power = false;
-        return this.tree[++this.index];
+        if (this.index + 1 >= this.tree.length) return this.power = false; // Check if the program should stop
+        return this.tree[++this.index]; // Return the next node
 
     }
 
-    private evaluate(): any { // @TODO Add type
+    private evaluate(): any {
 
         this.current = this.next() as Node;
 
@@ -54,8 +55,8 @@ export class Evaluator {
 
         switch (this.current.type) {
 
-            case 'assign': return this.assign();
-            case 'identifier': return this.identifier(this.current);
+            case 'assign': { return this.assign(this.current.children![0].value, this.current.children![1] as Node);} // Assigning a variable
+            case 'identifier': return this.identifier(this.current); // Identifying rest of the nodes
 
 
         }
@@ -72,10 +73,12 @@ export class Evaluator {
      */
     private identifier(node: Node): Node | void {
 
-        if (node.type == 'string') return node;
-        else if (node.type == 'number') return node;
-        else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction();
-        else return this.itsVariable(node);
+        if (node.type == 'assign') return this.assign(this.current.children![0].value, this.current.children![1] as Node); // Assigning a variable
+        else if (node.type == 'string') return node; // Returning a string
+        else if (node.type == 'number') return node; // Returning a number
+        else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(); // Checking if the node is a function  
+        else if (typeof node == 'boolean') return node; // Returning a boolean
+        else return this.itsVariable(node); // Returning a variable
     }
 
     /**
@@ -85,12 +88,24 @@ export class Evaluator {
      */
     private itsFunction(): void {
 
-        if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${this.current.value} requires arguments.`);
+        if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${this.current.value} requires arguments.`); // Checking if the function has arguments
 
-        const fun = FUNCTIONS.getFunction(this.current.value);
-        let args = (this.next() as Node).children!;
-        args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined);
-        fun.run(args.map((arg: Node) => arg.value));
+        const fun = FUNCTIONS.getFunction(this.current.value); // Getting the function
+
+        let args = (this.next() as Node).children!; // Getting the arguments
+
+        // for (let i = 0; i < args.length; i++) {
+        //     if (args[i].type == 'identifier' && args[i+1].type == 'assign' && (args[i].value == args[i+1].children![0].value)) {
+        //         args[i+1] = this.assign(args[i].value, args[i+1] as Node);
+        //         args.splice(i+1, 1);
+        //     }
+        // }
+
+        console.log(args)
+        args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined); // Getting the arguments
+
+        fun.run(args.map((arg: Node) => arg.value)); // Running the function
+
         this.addOutput = `Function "${this.current.value}" called with arguments: ${JSON.stringify(args)}\n`;
 
     }
@@ -103,6 +118,7 @@ export class Evaluator {
      */
     private itsVariable(node: Node): Node {
 
+        // console.log(node)
         let variable = STORAGE.getVariable(node.value);
         this.addOutput = `Variable "${node.value}" called. Value: ${variable}\n`;
         return variable;
@@ -114,9 +130,12 @@ export class Evaluator {
      * @description Assign a variable
      * @returns {void}
      */
-    private assign(): void {
-        STORAGE.setVariable = { name: this.current.children![0].value, value: this.current.children![1] as Node };
-        this.addOutput = `Variable "${this.current.children![0].value}" set to ${JSON.stringify(this.current.children![1])}\n`;
+    private assign(name: string, value: Node): Node {
+
+        // console.log(name, value)
+        STORAGE.setVariable = { name, value };
+        this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
+        return value;
     }
 
     /**

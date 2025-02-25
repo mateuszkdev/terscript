@@ -2,4 +2,4 @@ zupa = "pomidorowa zupa jest fajna"
 
 log(zupa, "rosol w sumie tez spoko")
 
-2-(2+1)
+log(pomidorowa = "fajna")
