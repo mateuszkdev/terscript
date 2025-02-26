@@ -10,7 +10,8 @@ export default {
             description: 'Print text in console',
             usage: 'log("Hello, World!")',
             run: (args) => {
-                console.log(...args)
+                console.log(...args);
+                return args;
             }
         }
     ]

@@ -78,7 +78,7 @@ export class Evaluator {
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(); // Checking if the node is a function  
         else if (typeof node == 'boolean') return node; // Returning a boolean
         else return this.itsVariable(node); // Returning a variable
-        
+
     }
 
     /**
@@ -86,8 +86,8 @@ export class Evaluator {
      * @description Evaluate a function
      * @returns {void}
      */
-    private itsFunction(): void {
-
+    private itsFunction(): any {
+        console.log(this.current)
         if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${this.current.value} requires arguments.`); // Checking if the function has arguments
 
         const fun = FUNCTIONS.getFunction(this.current.value); // Getting the function
@@ -95,9 +95,10 @@ export class Evaluator {
 
         // console.log(`{args: ${JSON.stringify(args)}}`)
 
-        fun.run(args.map((arg: Node) => arg.value)); // Running the function
-
+        const output = fun.run(args.map((arg: Node) => arg.value)) || 'void'; // Running the function
+        console.log(output)
         this.addOutput = `Function "${this.current.value}" called with arguments: ${JSON.stringify(args)}\n`;
+        return output;
 
     }
 

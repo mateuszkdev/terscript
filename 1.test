@@ -1,8 +1,5 @@
 
-szyszka = 4
-log(szyszka = "fajna")
-variables()
 
-pomidor = 2
-log(szyszka, pomidor)
-variables()
+vars = variables()
+
+log(vars, 12)
