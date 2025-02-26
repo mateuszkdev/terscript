@@ -99,16 +99,18 @@ export class Evaluator {
     private itsFunction(node: Node): any {
 
         this.debug(node, `itsFunction call`)
-        console.log(this.checkNextNode)
 
-        // @TODO Add support for functions with arguments inside the arguemnts
-        if (this.checkNextNode.type != 'arguments' || !node.children?.some(x => x.type == 'arguments')) throw new Error(`Function ${node.value} requires arguments.`); // Checking if the function has arguments
+        // Checking if the function has arguments
+        // if (this.checkNextNode.type != 'arguments' || !(node.children && node.children.some(x => x.type == 'arguments'))) throw new Error(`Function ${node.value} requires arguments.`); 
 
-        let args = [];
-        if (node.children && node.children.length >= 1 && node.children![1].type == 'arguments') {
-               args =     node.children![1].children!; // Getting the arguments from node childern
-        } else args = (this.next() as Node).children!; // Getting the arguments from next node
-        
+        let args = [] as Node[];
+
+        if (node.children && node.children.length >= 1) {
+            if (node.children![1] && node.children![1].type == 'arguments') args = node.children![1].children!; // Getting the arguments from node childern
+        } 
+        else if (this.checkNextNode.type == 'arguments') args = (this.next() as Node).children!; // Getting the arguments from next node
+        else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
+
         if (args.some((arg: Node) => arg.type == 'identifier' || arg.type == 'arguments')) { // Check if the arguments are functions with arguments
 
             let newArgs = [];
@@ -126,7 +128,6 @@ export class Evaluator {
             return newArgs.forEach((arg: Node) => this.identifier(arg)); // Identifying the arguments
         } 
         
-        console.log(args)
         args = this.parseArguments(args as Node[]); // Parsing the arguments
 
         // console.log(`{args: ${JSON.stringify(args)}}`)
@@ -146,7 +147,8 @@ export class Evaluator {
 
         const fun = FUNCTIONS.getFunction(functionName); // Getting the function
         const output = fun.run(args.map((arg: Node) => arg.value)) || 'void'; // Running the function
-        this.addOutput = `Function "${functionName}" called with arguments: ${JSON.stringify(args)}\n`;
+        this.addOutput = `Function "${functionName}" called with arguments: ${JSON.stringify(args)}`;
+        this.addOutput = `${functionName} output: ${JSON.stringify(output)}\n`;
         return output;
 
     }
