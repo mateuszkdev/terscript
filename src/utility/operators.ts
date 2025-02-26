@@ -13,5 +13,7 @@ export const operators = {
     multiply: [/\*/],
     divide: [/\//],
     leftParenthesis: [/\(/],
-    rightParenthesis: [/\)/]
+    rightParenthesis: [/\)/],
+    leftBrace: [/\{/],
+    rightBrace: [/\}/]
 }

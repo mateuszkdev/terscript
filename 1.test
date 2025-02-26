@@ -1,5 +1,3 @@
-pomidor = "drzewo"
-
-log(variables("xd"))
-
-log("vars")
+{
+    log(2)
+}

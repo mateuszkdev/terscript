@@ -59,9 +59,9 @@ export class Parser {
         if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') return this.power = false;
         if (this.checkNextToken.type == 'space' || this.checkNextToken.type == 'tab' || this.checkNextToken.type == 'enter') { this.next(); return this.parse()}
 
-        this.lastToken = this.current
+        this.lastToken = this.current || { type: 'undefined', value: '', line: 0, index: 0 };
         this.current = this.next();
-
+        // console.log(this.current)
         /* Checking maths */
         if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseMath();
 
@@ -71,6 +71,7 @@ export class Parser {
         else if (this.current.type == 'numbers') return { type: 'number', value: this.current.value, children: [] }
         else if (this.current.type == 'assign') return this.parseAssign();
         else if (this.current.type == 'leftParenthesis') return this.parseArguments();
+        else if (this.current.type == 'leftBrace') return this.parseBrances();
         else return this.parse();
 
     }
@@ -98,7 +99,7 @@ export class Parser {
         while (pwr) {
 
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') { this.next(); pwr = false; }
-
+            
             if (this.checkNextToken.type == 'leftParenthesis') { this.next(); args.push(this.parseArguments()); };
             if (this.checkNextToken.type == 'rightParenthesis') { this.next(); pwr = false; }
             else if (this.lastToken.type == 'identifier' && (this.current.type == 'assign' && this.lastToken.value == this.current.value)) {
@@ -114,23 +115,29 @@ export class Parser {
 
         return { type: 'arguments', value: '', children: args };
 
-        // let numberOfOpenedArguments: number = 1;
-        // let args: Node[][] = [];
-        // let pwr: boolean = true;
-        // while (pwr) {
-        //     if (this.checkNextToken.type == 'rightParenthesis' && args.length == numberOfOpenedArguments) { this.next(); pwr = false; }
-        //     else if (this.current.type == 'leftParenthesis') numberOfOpenedArguments++;
-        //     else if (this.lastToken.type == 'identifier' && (this.current.type == 'assign' && this.lastToken.value == this.current.value)) {
-        //         this.next();
-        //     }
-        //     else if (this.current.type == 'comma') {
-        //         this.next();
-        //         args[numberOfOpenedArguments - 1].push(this.parse() as Node)
-        //     }
-        //     else args[numberOfOpenedArguments - 1].push(this.parse() as Node);
-        // }
+    }
 
-        // return { type: 'arguments', value: '', children: args.flat() as Node[] };
+    /**
+     * @name parseBrances
+     * @description The parseBrances method is responsible for parsing the brances.
+     * @returns {Node} Parsed Brances
+     */
+    private parseBrances(): Node {
+
+        let brances: Node[] = [];
+        let pwr: boolean = true;
+
+        while (pwr) {
+
+            if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean' || !this.checkNextToken) { this.next(); pwr = false; break; }
+            if (this.checkNextToken.type == 'leftBrace') throw new Error('Braces are not allowed in braces');
+            if (this.checkNextToken.type == 'rightBrace') { this.next(); pwr = false; }
+
+            brances.push(this.parse() as Node);
+
+        }
+        
+        return { type: 'brances', value: '', children: brances }
 
     }
 
@@ -141,8 +148,10 @@ export class Parser {
      */
     private parseString(): Node {
 
-        const string = new String(this.scaleTokens());
-        this.updateIndex(string.index);
+        const string = new String(this.scaleTokens()); // parse the string
+        this.updateIndex(string.index); // update the index
+        if (this.tokens.slice(this.index)[0].type == 'quote') this.next(); // fix the index
+
         return { type: 'string', value: string.value, children: [] };
 
     }
@@ -164,9 +173,7 @@ export class Parser {
      * @description The scaleTokens method is responsible for scaling the tokens.
      * @returns {Token[]} The scaled tokens.
      */
-    private scaleTokens(): Token[] {
-        return this.tokens.slice(this.index);
-    }
+    private scaleTokens(): Token[] { return this.tokens.slice(this.index); }
 
     /**
      * @name updateIndex
@@ -174,18 +181,14 @@ export class Parser {
      * @param {number} i The number to add to the index. 
      * @returns {void}
      */
-    private updateIndex(i: number): void {
-        this.index += (i + 0);
-    }
+    private updateIndex(i: number): void { this.index += (i + 0); }
 
     /**
      * @name checkNextToken
      * @description The checkNextToken method is responsible for checking the next token.
      * @returns {Token} The next token.
      */
-    private get checkNextToken(): Token {
-        return this.tokens[this.index + 1];
-    }
+    private get checkNextToken(): Token { return this.tokens[this.index + 1]; }
 
     /**
      * @name next
@@ -196,7 +199,11 @@ export class Parser {
     private next(i: number = 0): Token { // can't be used in split method because it will skip space etc.
 
         let next = this.tokens[this.index + (1 + i)];
-        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter') return this.next(1);
+
+        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter' || next.type == 'carriageReturn') {
+            this.index++;
+            return this.next();
+        }
         else return this.tokens[++this.index];
 
     }

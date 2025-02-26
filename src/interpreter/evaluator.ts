@@ -100,9 +100,6 @@ export class Evaluator {
 
         this.debug(node, `itsFunction call`)
 
-        // Checking if the function has arguments
-        // if (this.checkNextNode.type != 'arguments' || !(node.children && node.children.some(x => x.type == 'arguments'))) throw new Error(`Function ${node.value} requires arguments.`); 
-
         let args = [] as Node[];
 
         if (node.children && node.children.length >= 1) {
@@ -117,7 +114,6 @@ export class Evaluator {
             for (let i = 0; i <= args.length; i++) {
 
                 if (args[i].type == 'identifier' && args[i+1].type == 'arguments') {
-                    // console.log("args i", args[i], "args i+1", args[i+1])
                     let arg = args[i]
                     arg.children?.push(args[++i]); // Adding the arguments to the function children
                     newArgs.push(arg)

@@ -15,10 +15,12 @@ export default class String {
     constructor (tokens: Token[]) {
 
         this.tokens = tokens;
+        // console.log(this.tokens, "string parsing input")
         if (this.tokens[0].type == 'quote') this.index = 0;
         while(this.power) this.parse();
 
         this.token = { type: 'string', value: this.value, line: this.current.line, index: this.current.index };
+        // console.log(this.token, "string parsing output")
 
     }
 
