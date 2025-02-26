@@ -1,5 +1,5 @@
+pomidor = "drzewo"
 
+log(variables())
 
-vars = variables()
-
-variables()
+log("vars")

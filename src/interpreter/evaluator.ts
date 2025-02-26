@@ -1,11 +1,13 @@
 import { Node } from '../types/Parser';
-import { STORAGE, FUNCTIONS } from '../index';
+import { STORAGE, FUNCTIONS, isDebug } from '../index';
 
 /**
  * @name Evaluator
  * @description Evaluate the tree
  */
 export class Evaluator {
+
+    private debug = (x: any, c: string) => isDebug && console.log(x, c);
 
     /* VARIABLES */
     private tree: Node[] = [];
@@ -56,6 +58,8 @@ export class Evaluator {
         this.skipNode(); // Skip a node if needed
 
         if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean' ) return this.power = false; // Check if the program should stop
+        
+        this.debug(this.current, `evaluate call`)
 
         switch (this.current.type) {
 
@@ -77,11 +81,11 @@ export class Evaluator {
      */
     private identifier(node: Node): Node | void {
 
-        console.log(this.current)
+        this.debug(node, `identifier call`)
         if (node.type == 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
         else if (node.type == 'string') return node; // Returning a string
         else if (node.type == 'number') return node; // Returning a number
-        else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(); // Checking if the node is a function  
+        else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (typeof node == 'boolean') return node; // Returning a boolean
         else return this.itsVariable(node); // Returning a variable
 
@@ -92,18 +96,20 @@ export class Evaluator {
      * @description Evaluate a function
      * @returns {void}
      */
-    private itsFunction(): any {
+    private itsFunction(node: Node): any {
 
-        if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${this.current.value} requires arguments.`); // Checking if the function has arguments
+        if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${node.value} requires arguments.`); // Checking if the function has arguments
 
-        const fun = FUNCTIONS.getFunction(this.current.value); // Getting the function
+        this.debug(node, `itsFunction call`)
+
+        const fun = FUNCTIONS.getFunction(node.value); // Getting the function
         const args = this.parseArguments((this.next() as Node).children!); // Getting the arguments
 
         // console.log(`{args: ${JSON.stringify(args)}}`)
 
         const output = fun.run(args.map((arg: Node) => arg.value)) || 'void'; // Running the function
         console.log(output)
-        this.addOutput = `Function "${this.current.value}" called with arguments: ${JSON.stringify(args)}\n`;
+        this.addOutput = `Function "${node.value}" called with arguments: ${JSON.stringify(args)}\n`;
         return output;
 
     }

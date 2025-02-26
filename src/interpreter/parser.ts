@@ -20,6 +20,8 @@ export class Parser {
 
     public tree: Node[] = [];
 
+    #i = 0;
+
     /**
      * @description The constructor for the Parser class.
      * @param tokens 
@@ -96,6 +98,10 @@ export class Parser {
         let args: Node[] = [];
         let pwr: boolean = true;
         while (pwr) {
+
+            if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') { this.next(); pwr = false; }
+            console.log(this.checkNextToken, ++this.#i)
+            if (this.checkNextToken.type == 'leftParenthesis') { this.next(); args.push(this.parseArguments()); };
             if (this.checkNextToken.type == 'rightParenthesis') { this.next(); pwr = false; }
             else if (this.lastToken.type == 'identifier' && (this.current.type == 'assign' && this.lastToken.value == this.current.value)) {
                 this.next();
@@ -105,9 +111,29 @@ export class Parser {
                 args.push(this.parse() as Node)
             }
             else args.push(this.parse() as Node);
+            
         }
 
         return { type: 'arguments', value: '', children: args };
+
+        // let numberOfOpenedArguments: number = 1;
+        // let args: Node[][] = [];
+        // let pwr: boolean = true;
+        // while (pwr) {
+        //     if (this.checkNextToken.type == 'rightParenthesis' && args.length == numberOfOpenedArguments) { this.next(); pwr = false; }
+        //     else if (this.current.type == 'leftParenthesis') numberOfOpenedArguments++;
+        //     else if (this.lastToken.type == 'identifier' && (this.current.type == 'assign' && this.lastToken.value == this.current.value)) {
+        //         this.next();
+        //     }
+        //     else if (this.current.type == 'comma') {
+        //         this.next();
+        //         args[numberOfOpenedArguments - 1].push(this.parse() as Node)
+        //     }
+        //     else args[numberOfOpenedArguments - 1].push(this.parse() as Node);
+        // }
+
+        // return { type: 'arguments', value: '', children: args.flat() as Node[] };
+
     }
 
     /**
@@ -130,7 +156,7 @@ export class Parser {
      */
     private parseAssign(): Node {
 
-        // this.tree.pop();
+        this.tree.pop();
         return { type: 'assign', value: '=', children: [this.lastToken, this.parse() as Token] };
 
     }
