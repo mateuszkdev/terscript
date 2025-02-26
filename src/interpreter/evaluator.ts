@@ -45,12 +45,17 @@ export class Evaluator {
 
     }
 
+    /**
+     * @name evaluate
+     * @description Evaluate the tree
+     * @returns {*}
+     */
     private evaluate(): any {
 
         this.current = this.next() as Node;
         this.skipNode(); // Skip a node if needed
 
-        if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean' ) return this.power = false;
+        if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean' ) return this.power = false; // Check if the program should stop
 
         switch (this.current.type) {
 
@@ -72,6 +77,7 @@ export class Evaluator {
      */
     private identifier(node: Node): Node | void {
 
+        console.log(this.current)
         if (node.type == 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
         else if (node.type == 'string') return node; // Returning a string
         else if (node.type == 'number') return node; // Returning a number
@@ -87,7 +93,7 @@ export class Evaluator {
      * @returns {void}
      */
     private itsFunction(): any {
-        console.log(this.current)
+
         if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${this.current.value} requires arguments.`); // Checking if the function has arguments
 
         const fun = FUNCTIONS.getFunction(this.current.value); // Getting the function
@@ -110,8 +116,8 @@ export class Evaluator {
      */
     private parseArguments(args: Node[]): Node[] {
 
-        args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined);
-        if (args.some((arg: Node) => arg.type == 'assign' || arg.type == 'identifier')) return this.parseArguments(args);
+        args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined); // Parse the arguments
+        if (args.some((arg: Node) => arg.type == 'assign' || arg.type == 'identifier')) return this.parseArguments(args); // Check if the arguments are variables
         return args;
 
     }
@@ -138,6 +144,19 @@ export class Evaluator {
      */
     private assign(name: string, value: Node): Node {
 
+        // console.log(name, value)
+        // console.log(this.checkNextNode)
+        if (FUNCTIONS.isFunction(value.value)) { // Check if the value is a function
+
+            const nextNode = this.next() as Node;
+            if (nextNode.type == 'arguments') { // Check if the function has arguments
+
+                value.children?.push(nextNode); // Add the arguments to the function
+                this.current = this.next() as Node; // Skip the arguments
+
+            } else throw new Error(`Function ${value.value} requires arguments.`); // Throw an error if the function does not have arguments
+
+        }
         STORAGE.setVariable = { name, value };
         this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
         return value;
@@ -148,9 +167,7 @@ export class Evaluator {
      * @description The checkNextNode method is responsible for checking the next Node.
      * @returns {Node} The next Node.
      */
-    private get checkNextNode(): Node {
-        return this.tree[this.index + 1];
-    }
+    private get checkNextNode(): Node { return this.tree[this.index + 1]; }
 
     /**
      * @name addOutput
@@ -158,9 +175,7 @@ export class Evaluator {
      * @param {string} x The string to add to the output.
      * @setter
      */
-    private set addOutput(x: string) {
-        this.output += `${x}\n`;
-    }
+    private set addOutput(x: string) { this.output += `${x}\n`; }
 
     /**
      * @name skipNode
@@ -176,7 +191,7 @@ export class Evaluator {
         // console.log(this.current, lastNode, nextNode, 1)
         if (currentNode.type == 'identifier') {
             // console.log(2)
-            if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) { this.current = this.next() as Node;}
+            if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) this.current = this.next() as Node;
         }
         
     }

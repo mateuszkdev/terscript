@@ -2,4 +2,4 @@
 
 vars = variables()
 
-log(vars, 12)
+variables()
