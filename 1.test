@@ -1,5 +1,5 @@
 pomidor = "drzewo"
 
-log(variables())
+log(variables("xd"))
 
 log("vars")

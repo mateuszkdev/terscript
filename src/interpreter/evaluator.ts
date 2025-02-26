@@ -98,18 +98,55 @@ export class Evaluator {
      */
     private itsFunction(node: Node): any {
 
-        if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${node.value} requires arguments.`); // Checking if the function has arguments
-
         this.debug(node, `itsFunction call`)
+        console.log(this.checkNextNode)
 
-        const fun = FUNCTIONS.getFunction(node.value); // Getting the function
-        const args = this.parseArguments((this.next() as Node).children!); // Getting the arguments
+        // @TODO Add support for functions with arguments inside the arguemnts
+        if (this.checkNextNode.type != 'arguments' || !node.children?.some(x => x.type == 'arguments')) throw new Error(`Function ${node.value} requires arguments.`); // Checking if the function has arguments
+
+        let args = [];
+        if (node.children && node.children.length >= 1 && node.children![1].type == 'arguments') {
+               args =     node.children![1].children!; // Getting the arguments from node childern
+        } else args = (this.next() as Node).children!; // Getting the arguments from next node
+        
+        if (args.some((arg: Node) => arg.type == 'identifier' || arg.type == 'arguments')) { // Check if the arguments are functions with arguments
+
+            let newArgs = [];
+            for (let i = 0; i <= args.length; i++) {
+
+                if (args[i].type == 'identifier' && args[i+1].type == 'arguments') {
+                    // console.log("args i", args[i], "args i+1", args[i+1])
+                    let arg = args[i]
+                    arg.children?.push(args[++i]); // Adding the arguments to the function children
+                    newArgs.push(arg)
+                    i++;
+                }
+            }
+
+            return newArgs.forEach((arg: Node) => this.identifier(arg)); // Identifying the arguments
+        } 
+        
+        console.log(args)
+        args = this.parseArguments(args as Node[]); // Parsing the arguments
 
         // console.log(`{args: ${JSON.stringify(args)}}`)
 
+        return this.callFunction(node.value, args); // Calling the function and returning output
+
+    }
+
+    /**
+     * @name callFunction
+     * @description Call a function
+     * @param {string} functionName The function name
+     * @param {Node[]} args The arguments
+     * @returns {*} The output of the function         
+     */
+    private callFunction(functionName: string, args: Node[]): any {
+
+        const fun = FUNCTIONS.getFunction(functionName); // Getting the function
         const output = fun.run(args.map((arg: Node) => arg.value)) || 'void'; // Running the function
-        console.log(output)
-        this.addOutput = `Function "${node.value}" called with arguments: ${JSON.stringify(args)}\n`;
+        this.addOutput = `Function "${functionName}" called with arguments: ${JSON.stringify(args)}\n`;
         return output;
 
     }

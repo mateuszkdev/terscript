@@ -20,8 +20,6 @@ export class Parser {
 
     public tree: Node[] = [];
 
-    #i = 0;
-
     /**
      * @description The constructor for the Parser class.
      * @param tokens 
@@ -100,7 +98,7 @@ export class Parser {
         while (pwr) {
 
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') { this.next(); pwr = false; }
-            console.log(this.checkNextToken, ++this.#i)
+
             if (this.checkNextToken.type == 'leftParenthesis') { this.next(); args.push(this.parseArguments()); };
             if (this.checkNextToken.type == 'rightParenthesis') { this.next(); pwr = false; }
             else if (this.lastToken.type == 'identifier' && (this.current.type == 'assign' && this.lastToken.value == this.current.value)) {
@@ -111,7 +109,7 @@ export class Parser {
                 args.push(this.parse() as Node)
             }
             else args.push(this.parse() as Node);
-            
+
         }
 
         return { type: 'arguments', value: '', children: args };
@@ -218,11 +216,15 @@ export class Parser {
             let tmp = ''
             if (Object.values(charset).some(r => r.test(this.current.type))) {
 
-                tmp = this.current.value
-                while (this.tokens[this.index + 1].type == this.current.type) {
-                    this.current = this.tokens[++this.index];
-                    tmp += this.current.value;
-                }
+                if (this.current.type == 'letters' || this.current.type == 'numbers') {
+
+                    tmp = this.current.value
+                    while (this.tokens[this.index + 1].type == this.current.type) {
+                        this.current = this.tokens[++this.index];
+                        tmp += this.current.value;
+                    }
+
+                } else tmp = this.current.value;
 
                 return this.current = { type: this.current.type, value: tmp, line: this.current.line, index: this.current.index };
                 
