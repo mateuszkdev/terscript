@@ -48,8 +48,7 @@ export class Evaluator {
     private evaluate(): any {
 
         this.current = this.next() as Node;
-
-        // console.log(this.current);
+        this.skipNode(); // Skip a node if needed
 
         if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean' ) return this.power = false;
 
@@ -73,12 +72,13 @@ export class Evaluator {
      */
     private identifier(node: Node): Node | void {
 
-        if (node.type == 'assign') return this.assign(this.current.children![0].value, this.current.children![1] as Node); // Assigning a variable
+        if (node.type == 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
         else if (node.type == 'string') return node; // Returning a string
         else if (node.type == 'number') return node; // Returning a number
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(); // Checking if the node is a function  
         else if (typeof node == 'boolean') return node; // Returning a boolean
         else return this.itsVariable(node); // Returning a variable
+        
     }
 
     /**
@@ -91,22 +91,27 @@ export class Evaluator {
         if (this.checkNextNode.type != 'arguments') throw new Error(`Function ${this.current.value} requires arguments.`); // Checking if the function has arguments
 
         const fun = FUNCTIONS.getFunction(this.current.value); // Getting the function
+        const args = this.parseArguments((this.next() as Node).children!); // Getting the arguments
 
-        let args = (this.next() as Node).children!; // Getting the arguments
-
-        // for (let i = 0; i < args.length; i++) {
-        //     if (args[i].type == 'identifier' && args[i+1].type == 'assign' && (args[i].value == args[i+1].children![0].value)) {
-        //         args[i+1] = this.assign(args[i].value, args[i+1] as Node);
-        //         args.splice(i+1, 1);
-        //     }
-        // }
-
-        console.log(args)
-        args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined); // Getting the arguments
+        // console.log(`{args: ${JSON.stringify(args)}}`)
 
         fun.run(args.map((arg: Node) => arg.value)); // Running the function
 
         this.addOutput = `Function "${this.current.value}" called with arguments: ${JSON.stringify(args)}\n`;
+
+    }
+
+    /**
+     * @name parseArguments
+     * @description Parse the arguments
+     * @argument {Node[]} args The arguments to parse
+     * @returns {Node[]} The parsed arguments
+     */
+    private parseArguments(args: Node[]): Node[] {
+
+        args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined);
+        if (args.some((arg: Node) => arg.type == 'assign' || arg.type == 'identifier')) return this.parseArguments(args);
+        return args;
 
     }
 
@@ -132,7 +137,6 @@ export class Evaluator {
      */
     private assign(name: string, value: Node): Node {
 
-        // console.log(name, value)
         STORAGE.setVariable = { name, value };
         this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
         return value;
@@ -155,6 +159,25 @@ export class Evaluator {
      */
     private set addOutput(x: string) {
         this.output += `${x}\n`;
+    }
+
+    /**
+     * @name skipNode
+     * @description Skip a node
+     * @returns 
+     */
+    private skipNode(): void {
+
+        const currentNode = this.current;
+        const lastNode = this.tree[this.index - 1] || { type: 'undefined' };
+        const nextNode = this.checkNextNode;
+
+        // console.log(this.current, lastNode, nextNode, 1)
+        if (currentNode.type == 'identifier') {
+            // console.log(2)
+            if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) { this.current = this.next() as Node;}
+        }
+        
     }
 
 }

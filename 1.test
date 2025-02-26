@@ -1,5 +1,8 @@
-zupa = "pomidorowa zupa jest fajna"
 
-log(zupa, "rosol w sumie tez spoko")
+szyszka = 4
+log(szyszka = "fajna")
+variables()
 
-log(pomidorowa = "fajna")
+pomidor = 2
+log(szyszka, pomidor)
+variables()

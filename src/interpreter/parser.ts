@@ -97,6 +97,9 @@ export class Parser {
         let pwr: boolean = true;
         while (pwr) {
             if (this.checkNextToken.type == 'rightParenthesis') { this.next(); pwr = false; }
+            else if (this.lastToken.type == 'identifier' && (this.current.type == 'assign' && this.lastToken.value == this.current.value)) {
+                this.next();
+            }
             else if (this.current.type == 'comma') {
                 this.next();
                 args.push(this.parse() as Node)
@@ -127,7 +130,7 @@ export class Parser {
      */
     private parseAssign(): Node {
 
-        this.tree.pop();
+        // this.tree.pop();
         return { type: 'assign', value: '=', children: [this.lastToken, this.parse() as Token] };
 
     }

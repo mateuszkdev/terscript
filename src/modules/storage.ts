@@ -19,7 +19,8 @@ export class Storage {
      */
     public set setVariable(variable: StorageVariableCell) {
 
-        if (this.memory.has(variable.name)) throw new Error(`Variable ${variable.name} already exists.`);
+        // if (this.memory.has(variable.name)) throw new Error(`Variable ${variable.name} already exists.`);
+        if (this.memory.has(variable.name)) this.memory.delete(variable.name);
 
         // @TODO Add a check for the type of the variable
         this.memory.set(variable.name, { name: `id-${this.id++}-memoryVariable`, value: variable.value });
