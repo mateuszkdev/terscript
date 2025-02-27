@@ -1,5 +1,5 @@
 import { readdirSync } from 'fs';
-import { Fun, Method } from '../types/Functions';
+import { Fun, Method, FunctionDeclaration } from '../types/Functions';
 
 /**
  * @name Functions
@@ -9,6 +9,7 @@ export class Functions {
 
     /* VARIABLES */
     private functions: Map<string, Fun> = new Map();
+    private processFunctions: Map<string, FunctionDeclaration> = new Map();
 
     /**
      * @description The Functions class is responsible for loading the functions.
@@ -38,6 +39,17 @@ export class Functions {
     }
 
     /**
+     * @name setFunction
+     * @description The setFunction method is responsible for setting a function.
+     * @param {string} name 
+     * @param {Method} value 
+     * @returns {void}
+     */
+    public setFunction(name: string, value: FunctionDeclaration): void {
+        this.processFunctions.set(name, value)
+    }
+
+    /**
      * @name isFunction
      * @description The isFunction method is responsible for checking if a function exists.
      * @param {string} name The name of the function. 
@@ -53,12 +65,13 @@ export class Functions {
      * @param {string} name The name of the function.
      * @returns {Fun} The function.
      */
-    public getFunction(name: string): Method {
+    public getFunction(name: string): Method | FunctionDeclaration {
 
-        const func = this.functions.get(name);
-        if (!func) throw new Error(`Function ${name} does not exist.`);
-        return func.methods.find(method => method.name === name) as Method;
-        
+        if (!this.functions.has(name) || !this.processFunctions.has(name)) throw new Error(`Function ${name} does not exist.`);
+
+        if (this.functions.has(name)) return this.functions.get(name)!.methods.find(method => method.name === name) as Method;
+        else return this.processFunctions.get(name) as FunctionDeclaration;
+
     }
 
 }

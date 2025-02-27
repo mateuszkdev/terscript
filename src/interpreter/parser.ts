@@ -200,7 +200,8 @@ export class Parser {
 
         let next = this.tokens[this.index + (1 + i)];
 
-        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter' || next.type == 'carriageReturn') {
+        if (!next || !next.type) { this.power = false; return { type: 'undefined', value: '', line: 0, index: 0 }; } // check if the next token is undefined
+        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter' || next.type == 'carriageReturn') { // check if the next token is a whitechar
             this.index++;
             return this.next();
         }
