@@ -86,20 +86,36 @@ export class Evaluator {
         if (node.type == 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
         else if (node.type == 'string') return node; // Returning a string
         else if (node.type == 'number') return node; // Returning a number
+        else if (this.checkFunctionDeclarationNodes(node)) return this.itsFunction(node); // Checking if the node is a function declaration
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (typeof node == 'boolean') return node; // Returning a boolean
         else return this.itsVariable(node); // Returning a variable
 
     }
 
+    /**
+     * @name checkFunctionDeclarationNodes
+     * @description Check if the function is correctly declared
+     * @param {Node} node The node to check
+     * @returns {boolean} If the function is correctly declared
+     */
+    private checkFunctionDeclarationNodes(node: Node): boolean {
+
+        this.debug(node, `checkFunctionDeclarationNodes call`);
+
+        if (node.type != 'identifier') return false;
+        if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) {
+            if (this.checkNextNode.type == 'arguments' && this.tree[this.index + 2].type == 'brances') return true;
+            if (node.children?.some((child: Node) => child.type == 'arguments') && this.checkNextNode.type == 'brances') return true;
+        }
+        return false;
+
+    }
+
     private checkFunctionDeclaration(node: Node): boolean {
 
-        /**
-         * jesli indetyfikator to istniejaca funkcja, pozwala dalej kontynuowac 
-         * jesli identyfikator to nie istniejaca funkcja, oraz nastepne Node to argumenty lub dziecko identyfikatora ma argumenty to tworzy nowa funkcje
-         * tworzy nowa funkcje tylko wtedy gdy powyzsza linijka jest spelniona, a nastepne Node to braces
-         */
-
+        this.debug(node, `checkFunctionDeclaration call`);
+        
         if (FUNCTIONS.isFunction(node.value)) return false; // Check if the function is declared
         if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) { // Check if the function has arguments
             
@@ -107,16 +123,16 @@ export class Evaluator {
 
             if (this.checkNextNode.type == 'arguments') functionData.args = (this.next() as Node).children!; // Getting the arguments from next node
             else functionData.args = node.children!.filter((child: Node) => child.type == 'arguments') as Node[]; // Getting the arguments from node children
+            
+            // this.next(); // Skip the arguments
 
-            this.next(); // Skip the arguments
-
-            if (!this.checkNextNode || this.checkNextNode.type != 'leftBrace') throw new Error(`Function ${node.value} requires braces.`); // Throw an error if the function does not have braces
+            if (!this.checkNextNode || this.checkNextNode.type != 'brances') throw new Error(`Function ${node.value} requires braces.`); // Throw an error if the function does not have braces
             functionData.run = (this.next() as Node).children!; // Getting the function run Nodes
 
             FUNCTIONS.setFunction(functionData.name, functionData); // Setting the function
-            this.addOutput = `Function "${functionData.name}" declared with arguments: ${JSON.stringify(functionData.args)}\n`; // Adding to the output
+            this.addOutput = `Function "${functionData.name}" declared with arguments:\n${JSON.stringify(functionData.args)}\nand exec:\n${JSON.stringify(functionData.run)}\n`; // Adding to the output
 
-        }
+        } else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
 
         return true;
 
