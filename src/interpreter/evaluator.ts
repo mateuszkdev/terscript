@@ -84,6 +84,7 @@ export class Evaluator {
 
         this.debug(node, `identifier call`)
         if (node.type == 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
+        else if (node.type == 'add' || node.type == 'subtract' || node.type == 'multiply' || node.type == 'divide') return this.isMath(node)
         else if (node.type == 'arguments') return node; // Returning arguments
         else if (node.type == 'string') return node; // Returning a string
         else if (node.type == 'number') return node; // Returning a number
@@ -91,6 +92,22 @@ export class Evaluator {
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (typeof node == 'boolean') return node; // Returning a boolean
         else this.itsVariable(node); // Returning a variable
+
+    }
+
+    /**
+     * @name isMath
+     * @description Evaluate math
+     * @param {Node} node The math node 
+     * @returb {Node}
+     */
+    private isMath(node: Node): Node {
+
+        let value = '';
+
+        console.log(node)
+
+        return { type: 'number', value: eval(value) }
 
     }
 

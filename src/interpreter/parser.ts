@@ -151,10 +151,10 @@ export class Parser {
             // console.log(this.current, this.checkNextToken)
             // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean' || !this.checkNextToken) { this.next(); break; }
-            if (this.checkNextToken.type == 'leftBrace') {
-                // console.log({ t: this.tree, tm1: this.tree[this.index - 1], nt: this.checkNextToken })
-                if (this.tree[this.index - 1].type != 'arguments') throw new Error('Braces are not allowed in braces');
-            }
+            // if (this.checkNextToken.type == 'leftBrace') {
+            //     // console.log({ t: this.tree, tm1: this.tree[this.index - 1], nt: this.checkNextToken })
+            //     if (this.tree[this.index - 1].type != 'arguments') throw new Error('Braces are not allowed in braces');
+            // }
             if (this.checkNextToken.type == 'rightBrace') { this.next(); break; }
             this.debug(this.current)
             braces.push(this.parse() as Node);
