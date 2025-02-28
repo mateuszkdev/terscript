@@ -2,7 +2,7 @@ import { Node } from '../types/Parser';
 import { STORAGE, FUNCTIONS, isDebug } from '../index';
 import { FunctionDeclaration } from 'types/Functions';
 
-const DEBUG: boolean = true;
+const DEBUG: boolean = false;
 
 /**
  * @name Evaluator

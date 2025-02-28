@@ -1,10 +1,17 @@
-pomarancza = 10
-
-pomidor(x) {
-    log("czerwony")
+pomidor() {
+    log("pomidor jest czerwony")
 }
 
-a = 1
+marchewka() {
+    log("Marchewka jest pomaranczowa")
+}
 
-variables()
-pomidor("fajny")
+jedzenie() {
+
+    pomidor()
+    marchewka()
+
+}
+
+log("Jakie sa jedzenia?")
+jedzenie()
