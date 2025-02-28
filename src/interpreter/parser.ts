@@ -49,9 +49,9 @@ export class Parser {
 
             if (typeof this.node === 'undefined' || typeof this.node === 'boolean') break;
 
-            console.log("-----------------------------")
-            console.log({ node: JSON.stringify(this.node) }) // test log
-            console.log("-----------------------------")
+            // console.log("-----------------------------")
+            // console.log({ node: JSON.stringify(this.node) }) // test log
+            // console.log("-----------------------------")
 
             this.tree.push(this.node);
         }
