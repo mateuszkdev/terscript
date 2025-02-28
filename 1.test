@@ -1,3 +1,8 @@
 pomidor(x) {
     log("pomidor", x)
 }
+
+kolor = "czerwony"
+
+pomidor(kolor)
+log(kolor)

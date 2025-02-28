@@ -13,7 +13,7 @@ const DEBUG: boolean = true;
  */
 export class Parser {
 
-    private debug = (x: any, c: string) => (isDebug && DEBUG) && console.log(x, c);
+    private debug = (x: any, c?: string) => (isDebug && DEBUG) && console.log(x, c);
     #i = 0;
 
     /* VARIABLES */
@@ -37,7 +37,7 @@ export class Parser {
 
         // Loop through the tokens for splitting
         let tmpTokens: Token[] = [];
-        while(this.power) tmpTokens.push(this.split() as Token);
+        while (this.power) tmpTokens.push(this.split() as Token);
 
         // Set the tokens and reset variables
         this.power = true;
@@ -48,7 +48,7 @@ export class Parser {
         // console.log(this.tokens) // test log
 
         // Loop through the tokens for parsing
-        while(this.power) {
+        while (this.power) {
             this.node = this.parse() as Node;
             this.tree.push(this.node);
         }
@@ -66,7 +66,7 @@ export class Parser {
 
         /* Check if program should sotp and skipping whitechars */
         if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') return this.power = false;
-        if (this.checkNextToken.type == 'space' || this.checkNextToken.type == 'tab' || this.checkNextToken.type == 'enter') { this.next(); return this.parse()}
+        if (this.checkNextToken.type == 'space' || this.checkNextToken.type == 'tab' || this.checkNextToken.type == 'enter') { this.next(); return this.parse() }
 
         this.lastToken = this.current || { type: 'undefined', value: '', line: 0, index: 0 };
         this.current = this.next();
@@ -104,15 +104,16 @@ export class Parser {
      * @returns {Node} Parsed Arguments
      */
     private parseArguments(): Node {
-        
+
         this.debug(this.current, 'parseArguments call') // debug log;
 
         let args: Node[] = [];
         let pwr: boolean = true;
+        this.debug('Parsing Arguments')
         while (pwr) {
-            
+
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') { this.next(); pwr = false; }
-            
+
             if (this.checkNextToken.type == 'leftParenthesis') { this.next(); args.push(this.parseArguments()); };
             if (this.checkNextToken.type == 'rightParenthesis') { this.next(); pwr = false; }
             else if (this.lastToken.type == 'identifier' && (this.current.type == 'assign' && this.lastToken.value == this.current.value)) {
@@ -125,7 +126,7 @@ export class Parser {
             else args.push(this.parse() as Node);
 
         }
-
+        this.debug({ type: 'arguments', value: '', children: args }, 'arguments output')
         return { type: 'arguments', value: '', children: args };
 
     }
@@ -139,20 +140,18 @@ export class Parser {
 
         this.debug(this.current, 'parseBrances call') // debug log;
 
-        let brances: Node[] = [];
-        let pwr: boolean = true;
+        const brances: Node[] = [];
 
-        while (pwr) {
-
-            console.log(this.current, this.checkNextToken)
-            if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean' || !this.checkNextToken) { this.next(); pwr = false; break; }
+        this.debug('Parsing Brances')
+        while (true) {
+            if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean' || !this.checkNextToken) { this.next(); break; }
             if (this.checkNextToken.type == 'leftBrace') throw new Error('Braces are not allowed in braces');
-            if (this.checkNextToken.type == 'rightBrace') { this.next(); pwr = false; }
-
+            if (this.checkNextToken.type == 'rightBrace') { this.next(); break; }
+            this.debug(this.current)
             brances.push(this.parse() as Node);
-
         }
-        
+
+        this.debug({ type: 'brances', value: '', children: brances }, 'brances output')
         return { type: 'brances', value: '', children: brances }
 
     }
@@ -255,11 +254,11 @@ export class Parser {
                 } else tmp = this.current.value;
 
                 return this.current = { type: this.current.type, value: tmp, line: this.current.line, index: this.current.index };
-                
+
             } else return this.current = this.tokens[++this.index];
 
         }
-        
+
     }
 
     /**
