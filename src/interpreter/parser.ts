@@ -1,11 +1,9 @@
 import { Token, Node } from '../types/Parser';
-// import { operators } from '../utility/operators';
+import { operators } from '../utility/operators';
 import { charset } from '../utility/charset';
-import { isDebug } from '../index';
+import { isDebug, debugFile } from '../index';
 
 import String from './parser/string';
-
-const DEBUG: boolean = true;
 
 /**
  * @name Parser
@@ -13,7 +11,7 @@ const DEBUG: boolean = true;
  */
 export class Parser {
 
-    private debug = (x: any, c?: string) => (isDebug && DEBUG) && console.log(x, c);
+    private debug = (x: any, c?: string) => (isDebug && debugFile == 'parser') && console.log(x, c);
     #i = 0;
 
     /* VARIABLES */

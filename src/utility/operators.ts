@@ -15,5 +15,11 @@ export const operators = {
     leftParenthesis: [/\(/],
     rightParenthesis: [/\)/],
     leftBrace: [/\{/],
-    rightBrace: [/\}/]
+    rightBrace: [/\}/],
+}
+
+export const comments = {
+    leftComment: /\/*/,
+    rightComment: /\*/,
+    inlineComment: /\//
 }

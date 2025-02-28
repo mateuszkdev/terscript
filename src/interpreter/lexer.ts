@@ -1,14 +1,16 @@
 /* IMPORTS */
-import { operators } from '../utility/operators';
+import { operators, comments } from '../utility/operators';
 import { charset } from '../utility/charset';
 import { Token } from '../types/Parser';
-import { isDev } from '../index';
+import { isDebug, debugFile } from '../index';
 
 /**
  * @name Lexer
  * @description The Lexer class is responsible for converting the raw code into a list of tokens.
  */
 export class Lexer {
+
+    private debug = (x: any, c?: string) => (isDebug && debugFile == 'lexer') && console.log(x, c);
 
     /* VARIABLES */
     private code: string[] = [];
@@ -31,6 +33,8 @@ export class Lexer {
             let tmp = this.next() as Token; // Get the next token
             this.tokens.push(this.organizeToken(tmp)); // Push the next organized token
         }
+
+        this.debug(this.tokens, 'tokens');
 
     }
 
@@ -69,9 +73,16 @@ export class Lexer {
      */
     private next(): Token | boolean {
 
+        this.debug(this.code[this.index + 1], 'next call');
+
         let tmp = undefined;
 
         if (!this.code[this.index + 1]) return this.power = false; // End of Lexer
+
+        if (tmp == undefined && comments.inlineComment.test(this.code[this.index + 1])) { // Inline Comment
+            while (this.code[this.index + 1] != '\n') this.index++;
+            return this.next();
+        }
 
         (tmp == undefined) && Object.entries(operators).forEach(o => o[1].some(r => r.test(this.code[this.index + 1]) && (tmp = o[0]))); // Operators
         (tmp == undefined) && Object.entries(charset).forEach(c => (c[1].test(this.code[this.index + 1]) && (tmp = c[0]))); // Charset

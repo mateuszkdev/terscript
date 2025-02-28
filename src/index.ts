@@ -4,6 +4,7 @@
 import flags from './modules/flags';
 export const isDev = flags.dev; // dev setter
 export const isDebug = flags.debug; // debug setter
+export const debugFile = flags.debugFile; // debugFile setter
 
 import { Storage } from './modules/storage';
 import { Functions } from './modules/functions';

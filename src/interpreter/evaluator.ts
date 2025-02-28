@@ -1,8 +1,6 @@
 import { Node } from '../types/Parser';
-import { STORAGE, FUNCTIONS, isDebug } from '../index';
+import { STORAGE, FUNCTIONS, isDebug, debugFile } from '../index';
 import { FunctionDeclaration } from 'types/Functions';
-
-const DEBUG: boolean = false;
 
 /**
  * @name Evaluator
@@ -10,7 +8,7 @@ const DEBUG: boolean = false;
  */
 export class Evaluator {
 
-    private debug = (x: any, c: string) => (isDebug && DEBUG) && console.log(x, c);
+    private debug = (x: any, c?: string) => (isDebug && debugFile == 'eval') && console.log(x, c);
 
     /* VARIABLES */
     private current: Node = { type: 'undefined', value: '', children: [] };
