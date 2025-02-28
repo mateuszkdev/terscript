@@ -1,5 +1,5 @@
 import { Token, Node } from '../types/Parser';
-import { operators } from '../utility/operators';
+// import { operators } from '../utility/operators';
 import { charset } from '../utility/charset';
 import { isDebug } from '../index';
 
@@ -18,7 +18,6 @@ export class Parser {
 
     /* VARIABLES */
     private power: boolean = true;
-    private tokens: Token[] = [];
     private index: number = -1;
     private current: Token = { type: 'undefined', value: '', line: 0, index: 0 };
     private node: Node = { type: 'undefined', value: '', children: [] };
@@ -30,10 +29,7 @@ export class Parser {
      * @description The constructor for the Parser class.
      * @param tokens 
      */
-    constructor(tokens: Token[]) {
-
-        // Set the tokens
-        this.tokens = tokens;
+    constructor(private tokens: Token[]) {
 
         // Loop through the tokens for splitting
         let tmpTokens: Token[] = [];
@@ -50,6 +46,13 @@ export class Parser {
         // Loop through the tokens for parsing
         while (this.power) {
             this.node = this.parse() as Node;
+
+            if (typeof this.node === 'undefined' || typeof this.node === 'boolean') break;
+
+            console.log("-----------------------------")
+            console.log({ node: JSON.stringify(this.node) }) // test log
+            console.log("-----------------------------")
+
             this.tree.push(this.node);
         }
 
@@ -64,9 +67,9 @@ export class Parser {
 
         this.debug(this.current, `parse call ${++this.#i}`) // debug log;
 
-        /* Check if program should sotp and skipping whitechars */
-        if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') return this.power = false;
-        if (this.checkNextToken.type == 'space' || this.checkNextToken.type == 'tab' || this.checkNextToken.type == 'enter') { this.next(); return this.parse() }
+        /* Check if program should stop and skip white spaces */
+        if (typeof this.checkNextToken === 'undefined' || typeof this.checkNextToken === 'boolean') return this.power = false;
+        if (this.checkNextToken.type === 'space' || this.checkNextToken.type === 'tab' || this.checkNextToken.type === 'enter') { this.next(); return this.parse() }
 
         this.lastToken = this.current || { type: 'undefined', value: '', line: 0, index: 0 };
         this.current = this.next();
@@ -80,7 +83,7 @@ export class Parser {
         else if (this.current.type == 'numbers') return { type: 'number', value: this.current.value, children: [] }
         else if (this.current.type == 'assign') return this.parseAssign();
         else if (this.current.type == 'leftParenthesis') return this.parseArguments();
-        else if (this.current.type == 'leftBrace') return this.parseBrances();
+        else if (this.current.type == 'leftBrace') return this.parseBraces();
         else return this.parse();
 
     }
@@ -132,27 +135,30 @@ export class Parser {
     }
 
     /**
-     * @name parseBrances
-     * @description The parseBrances method is responsible for parsing the brances.
-     * @returns {Node} Parsed Brances
+     * @name parseBraces
+     * @description The parseBraces method is responsible for parsing the braces.
+     * @returns {Node} Parsed Braces
      */
-    private parseBrances(): Node {
+    private parseBraces(): Node {
 
-        this.debug(this.current, 'parseBrances call') // debug log;
+        this.debug(this.current, 'parseBraces call') // debug log;
 
-        const brances: Node[] = [];
+        const braces: Node[] = [];
 
-        this.debug('Parsing Brances')
+        this.debug('Parsing Braces')
         while (true) {
+            // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+            // console.log(this.current, this.checkNextToken)
+            // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean' || !this.checkNextToken) { this.next(); break; }
             if (this.checkNextToken.type == 'leftBrace') throw new Error('Braces are not allowed in braces');
             if (this.checkNextToken.type == 'rightBrace') { this.next(); break; }
             this.debug(this.current)
-            brances.push(this.parse() as Node);
+            braces.push(this.parse() as Node);
         }
 
-        this.debug({ type: 'brances', value: '', children: brances }, 'brances output')
-        return { type: 'brances', value: '', children: brances }
+        this.debug({ type: 'braces', value: '', children: braces }, 'braces output')
+        return { type: 'braces', value: '', children: braces }
 
     }
 
@@ -166,8 +172,17 @@ export class Parser {
         this.debug(this.current, 'parseString call') // debug log;
 
         const string = new String(this.scaleTokens()); // parse the string
+        // console.log("*********************************")
+        // console.log({ stringIndex: string.index })
+        // console.log({ scaledTokens: this.scaleTokens() })
+        // console.log({tokens: this.tokens[(this.index + string.index)]})
+        // console.log({string: string })
         this.updateIndex(string.index); // update the index
-        if (this.tokens.slice(this.index)[0].type == 'quote') this.next(); // fix the index
+        // console.log({ currentAfterString: this.current, currentByIndex: this.tokens[this.index] })
+        if (this.current.type == 'quote') this.index; // fix the index
+        // console.log({ currentAfterQuoteDelete: this.current })
+        // console.log({ nextToken: this.checkNextToken })
+        // console.log("*********************************")
 
         return { type: 'string', value: string.value, children: [] };
 
@@ -200,7 +215,7 @@ export class Parser {
      * @param {number} i The number to add to the index. 
      * @returns {void}
      */
-    private updateIndex(i: number): void { this.index += (i + 0); }
+    private updateIndex(i: number): void { this.index += i; }
 
     /**
      * @name checkNextToken
@@ -220,7 +235,7 @@ export class Parser {
         let next = this.tokens[this.index + (1 + i)];
 
         if (!next || !next.type) { this.power = false; return { type: 'undefined', value: '', line: 0, index: 0 }; } // check if the next token is undefined
-        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter' || next.type == 'carriageReturn') { // check if the next token is a whitechar ( there is no need due to the clearTokens method but better to be prepared)
+        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter' || next.type == 'carriageReturn') { // check if the next token is a white char (there is no need due to the clearTokens method but better to be prepared)
             this.index++;
             return this.next();
         }

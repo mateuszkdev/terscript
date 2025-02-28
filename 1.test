@@ -1,8 +1,10 @@
+pomarancza = 10
+
 pomidor(x) {
-    log("pomidor", x)
+    log(x, "czerwony")
 }
 
-kolor = "czerwony"
+y = variables()
 
-pomidor(kolor)
-log(kolor)
+pomidor("fajny")
+log(y)

@@ -27,12 +27,12 @@ export class Evaluator {
     constructor(tree: Node[]) {
 
         this.tree = tree;
-        
+
         // Loop through the tree
         while (this.power) {
 
             if (this.index + 1 >= this.tree.length) this.power = false;
-            this.evaluate(); 
+            this.evaluate();
 
         }
 
@@ -44,8 +44,9 @@ export class Evaluator {
      * @returns {Node | boolean} The next node in the tree
      */
     private next(): Node | boolean {
-        
+
         if (this.index + 1 >= this.tree.length) return this.power = false; // Check if the program should stop
+        if (typeof this.tree[this.index + 1] == 'boolean') { this.power = false; return false; }; // Skip the node if it is undefined
         return this.tree[++this.index]; // Return the next node
 
     }
@@ -59,14 +60,14 @@ export class Evaluator {
 
         this.current = this.next() as Node;
         this.skipNode(); // Skip a node if needed
-
-        if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean' ) return this.power = false; // Check if the program should stop
         
+        if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean') return this.power = false; // Check if the program should stop
+
         this.debug(this.current, `evaluate call`)
 
         switch (this.current.type) {
 
-            case 'assign': { return this.assign(this.current.children![0].value, this.current.children![1] as Node);} // Assigning a variable
+            case 'assign': { return this.assign(this.current.children![0].value, this.current.children![1] as Node); } // Assigning a variable
             case 'identifier': return this.identifier(this.current); // Identifying rest of the nodes
 
 
@@ -107,6 +108,7 @@ export class Evaluator {
 
         if (node.type != 'identifier') return false;
         if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) {
+            if (!this.checkNextNode || !this.tree[this.index + 2]) return false;
             if (this.checkNextNode.type == 'arguments' && this.tree[this.index + 2].type == 'brances') return true;
             if (node.children?.some((child: Node) => child.type == 'arguments') && this.checkNextNode.type == 'brances') return true;
         }
@@ -114,18 +116,27 @@ export class Evaluator {
 
     }
 
+    /**
+     * @name checkFunctionDeclaration
+     * @description Check if the function is correctly declared
+     * @param {Node} node The node to check
+     * @returns {boolean} If the function is correctly declared
+     * @throws {Error} If the function is not correctly declared
+     * @throws {Error} If the function does not have arguments
+     * @throws {Error} If the function does not have braces
+     */
     private checkFunctionDeclaration(node: Node): boolean {
 
         this.debug(node, `checkFunctionDeclaration call`);
-        
-        if (FUNCTIONS.isFunction(node.value)) return false; // Check if the function is declared
+
+        if (FUNCTIONS.isFunction(node.value)) return true; // Check if the function is declared
         if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) { // Check if the function has arguments
-            
+
             const functionData: FunctionDeclaration = { name: node.value, args: [], run: [] };
 
             if (this.checkNextNode.type == 'arguments') functionData.args = (this.next() as Node).children!; // Getting the arguments from next node
             else functionData.args = node.children!.filter((child: Node) => child.type == 'arguments') as Node[]; // Getting the arguments from node children
-            
+
             // this.next(); // Skip the arguments
 
             if (!this.checkNextNode || this.checkNextNode.type != 'brances') throw new Error(`Function ${node.value} requires braces.`); // Throw an error if the function does not have braces
@@ -136,7 +147,7 @@ export class Evaluator {
 
         } else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
 
-        return true;
+        return false;
 
     }
 
@@ -148,41 +159,46 @@ export class Evaluator {
     private itsFunction(node: Node): any {
 
         this.debug(node, `itsFunction call`)
-
-        if (!this.checkFunctionDeclaration(node)) { // Check if the function is declared, if not declare it and skip function execution
-
+        if (this.checkFunctionDeclaration(node)) { // Check if the function is declared, if not declare it and skip function execution
             let args = [] as Node[];
 
-            if (node.children && node.children.length >= 1) {
-                if (node.children![1] && node.children![1].type == 'arguments') args = node.children![1].children!; // Getting the arguments from node childern
-            } 
-            else if (this.checkNextNode.type == 'arguments') args = (this.next() as Node).children!; // Getting the arguments from next node
-            else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
-    
+            if ((node.children && node.children.length >= 1) || this.checkNextNode.type == 'arguments') { // Check if the function has arguments
+                if (node.children![1] && node.children![1].type == 'arguments') {
+                    args = node.children![1].children!; // Getting the arguments from node children
+                }
+                else if (this.checkNextNode.type == 'arguments') {
+                    args = (this.next() as Node).children!; // Getting the arguments from next node
+                }
+                else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
+            }
+
+
             if (args.some((arg: Node) => arg.type == 'identifier' || arg.type == 'arguments')) { // Check if the arguments are functions with arguments
-    
+
                 let newArgs = [];
                 for (let i = 0; i <= args.length; i++) {
-    
-                    if (args[i].type == 'identifier' && args[i+1].type == 'arguments') {
+
+                    if (args[i].type == 'identifier' && args[i + 1].type == 'arguments') {
                         let arg = args[i]
                         arg.children?.push(args[++i]); // Adding the arguments to the function children
                         newArgs.push(arg)
                         i++;
                     }
                 }
-    
+
                 return newArgs.forEach((arg: Node) => this.identifier(arg)); // Identifying the arguments
-            } 
-            
+            }
+
+
+            console.log({ args })
+
             args = this.parseArguments(args as Node[]); // Parsing the arguments
-    
+
             // console.log(`{args: ${JSON.stringify(args)}}`)
-    
+
             return this.callFunction(node.value, args); // Calling the function and returning output
 
         }
-
     }
 
     /**
@@ -279,15 +295,15 @@ export class Evaluator {
     private skipNode(): void {
 
         const currentNode = this.current;
-        const lastNode = this.tree[this.index - 1] || { type: 'undefined' };
+        // const lastNode = this.tree[this.index - 1] || { type: 'undefined' };
         const nextNode = this.checkNextNode;
 
         // console.log(this.current, lastNode, nextNode, 1)
-        if (currentNode.type == 'identifier') {
+        if (currentNode && currentNode.type == 'identifier') {
             // console.log(2)
             if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) this.current = this.next() as Node;
-        }
-        
+        } else this.current = this.next() as Node;
+
     }
 
 }

@@ -2,7 +2,7 @@ import { Fun } from 'types/Functions'
 
 export default {
     name: 'console',
-    description: 'Function to display information in colsole.',
+    description: 'Function to display information in console.',
 
     methods: [
         {

@@ -67,7 +67,7 @@ export class Functions {
      */
     public getFunction(name: string): Method | FunctionDeclaration {
 
-        if (!this.functions.has(name) || !this.processFunctions.has(name)) throw new Error(`Function ${name} does not exist.`);
+        if (!this.functions.has(name) && !this.processFunctions.has(name)) throw new Error(`Function ${name} does not exist.`);
 
         if (this.functions.has(name)) return this.functions.get(name)!.methods.find(method => method.name === name) as Method;
         else return this.processFunctions.get(name) as FunctionDeclaration;
