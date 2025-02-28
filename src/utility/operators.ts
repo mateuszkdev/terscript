@@ -21,5 +21,5 @@ export const operators = {
 export const comments = {
     leftComment: /\/*/,
     rightComment: /\*/,
-    inlineComment: /\//
+    inlineComment: /#/
 }

@@ -25,7 +25,7 @@
         "name": "support.function.ters"
       },
       {
-        "match": "//.*$",
+        "match": "#.*$",
         "name": "comment.line.ters"
       },
       {

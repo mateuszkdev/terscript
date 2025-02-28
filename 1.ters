@@ -2,7 +2,7 @@ pomidor() {
 
     log("pomidor jest czerwony")
 
-   // log(1+1)
+    #log(1+1)
 
     marchewka() {
         log("Marchewka jest pomaranczowa")
@@ -13,7 +13,7 @@ pomidor() {
 jedzenie() {
 
     pomidor()
-    //marchewka()
+    #marchewka()
 
 }
 
