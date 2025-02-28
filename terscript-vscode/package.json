@@ -1,0 +1,29 @@
+{
+  "name": "terscript-syntax",
+  "displayName": "TerScript Syntax Highlighting",
+  "description": "Syntax highlighting for TerScript (.ters)",
+  "version": "0.0.1",
+  "publisher": "mateusz4711",
+  "author": "Mateusz4711 (https://github.com/mateuszkdev)",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "terscript",
+        "aliases": ["TerScript", "terscript"],
+        "extensions": [".ters"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "terscript",
+        "scopeName": "source.ters",
+        "path": "./syntaxes/terscript.tmLanguage.json"
+      }
+    ]
+  }
+}

@@ -10,7 +10,6 @@ pomidor() {
 
 }
 
-
 jedzenie() {
 
     pomidor()
@@ -20,3 +19,4 @@ jedzenie() {
 
 log("Jakie sa jedzenia?")
 jedzenie()
+

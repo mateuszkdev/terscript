@@ -1,5 +1,5 @@
 export default {
 
-    extension: '.test'
+    extension: '.ters'
 
 }
