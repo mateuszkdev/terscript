@@ -5,7 +5,7 @@ import { isDebug } from '../index';
 
 import String from './parser/string';
 
-const DEBUG: boolean = true;
+const DEBUG: boolean = false;
 
 /**
  * @name Parser

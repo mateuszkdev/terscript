@@ -15,6 +15,7 @@ export default {
                 STORAGE.memory.forEach((value, key) => {
                     variables.push({ name: key, value: value.value })
                 })
+                console.log(variables)
                 // console.log(variables) // @TODO: Return the variables / need to implement a return system
                 return variables
             }

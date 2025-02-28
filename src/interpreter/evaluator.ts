@@ -2,7 +2,7 @@ import { Node } from '../types/Parser';
 import { STORAGE, FUNCTIONS, isDebug } from '../index';
 import { FunctionDeclaration } from 'types/Functions';
 
-const DEBUG: boolean = false;
+const DEBUG: boolean = true;
 
 /**
  * @name Evaluator
@@ -13,7 +13,6 @@ export class Evaluator {
     private debug = (x: any, c: string) => (isDebug && DEBUG) && console.log(x, c);
 
     /* VARIABLES */
-    private tree: Node[] = [];
     private current: Node = { type: 'undefined', value: '', children: [] };
     private index: number = -1;
     private power: boolean = true;
@@ -24,9 +23,7 @@ export class Evaluator {
      * @name constructor
      * @description Initialize the Evaluator
      */
-    constructor(tree: Node[]) {
-
-        this.tree = tree;
+    constructor(private tree: Node[]) {
 
         // Loop through the tree
         while (this.power) {
@@ -47,7 +44,7 @@ export class Evaluator {
 
         if (this.index + 1 >= this.tree.length) return this.power = false; // Check if the program should stop
         if (typeof this.tree[this.index + 1] == 'boolean') { this.power = false; return false; }; // Skip the node if it is undefined
-        return this.tree[++this.index]; // Return the next node
+        return this.current = this.tree[++this.index]; // Return the next node
 
     }
 
@@ -60,7 +57,7 @@ export class Evaluator {
 
         this.current = this.next() as Node;
         this.skipNode(); // Skip a node if needed
-        
+
         if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean') return this.power = false; // Check if the program should stop
 
         this.debug(this.current, `evaluate call`)
@@ -87,12 +84,13 @@ export class Evaluator {
 
         this.debug(node, `identifier call`)
         if (node.type == 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
+        else if (node.type == 'arguments') return node; // Returning arguments
         else if (node.type == 'string') return node; // Returning a string
         else if (node.type == 'number') return node; // Returning a number
         else if (this.checkFunctionDeclarationNodes(node)) return this.itsFunction(node); // Checking if the node is a function declaration
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (typeof node == 'boolean') return node; // Returning a boolean
-        else return this.itsVariable(node); // Returning a variable
+        else this.itsVariable(node); // Returning a variable
 
     }
 
@@ -107,12 +105,16 @@ export class Evaluator {
         this.debug(node, `checkFunctionDeclarationNodes call`);
 
         if (node.type != 'identifier') return false;
+
         if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) {
-            if (!this.checkNextNode || !this.tree[this.index + 2]) return false;
-            if (this.checkNextNode.type == 'arguments' && this.tree[this.index + 2].type == 'brances') return true;
-            if (node.children?.some((child: Node) => child.type == 'arguments') && this.checkNextNode.type == 'brances') return true;
+            if (!this.checkNextNode || !this.tree[this.index + 2]) { return false; }
+
+            if (this.checkNextNode.type == 'arguments' && this.tree[this.index + 2].type == 'braces') { return true; }
+
+            if (node.children?.some((child: Node) => child.type == 'arguments') && this.checkNextNode.type == 'braces') { return true; }
         }
-        return false;
+
+        return false
 
     }
 
@@ -139,7 +141,7 @@ export class Evaluator {
 
             // this.next(); // Skip the arguments
 
-            if (!this.checkNextNode || this.checkNextNode.type != 'brances') throw new Error(`Function ${node.value} requires braces.`); // Throw an error if the function does not have braces
+            if (!this.checkNextNode || this.checkNextNode.type != 'braces') throw new Error(`Function ${node.value} requires braces.`); // Throw an error if the function does not have braces
             functionData.run = (this.next() as Node).children!; // Getting the function run Nodes
 
             FUNCTIONS.setFunction(functionData.name, functionData); // Setting the function
@@ -178,7 +180,7 @@ export class Evaluator {
                 let newArgs = [];
                 for (let i = 0; i <= args.length; i++) {
 
-                    if (args[i].type == 'identifier' && args[i + 1].type == 'arguments') {
+                    if (args[i] && args[i].type == 'identifier' && args[i + 1] && args[i + 1].type == 'arguments') {
                         let arg = args[i]
                         arg.children?.push(args[++i]); // Adding the arguments to the function children
                         newArgs.push(arg)
@@ -188,9 +190,6 @@ export class Evaluator {
 
                 return newArgs.forEach((arg: Node) => this.identifier(arg)); // Identifying the arguments
             }
-
-
-            console.log({ args })
 
             args = this.parseArguments(args as Node[]); // Parsing the arguments
 
@@ -211,11 +210,20 @@ export class Evaluator {
     private callFunction(functionName: string, args: Node[]): any {
 
         const fun = FUNCTIONS.getFunction(functionName); // Getting the function
-        const output = (fun as any).run(args.map((arg: Node) => arg.value)) || 'void'; // Running the function
+        const isProcessFunction = typeof fun.run !== 'function'; // Check if the function is a process function
+
+        const output = !isProcessFunction ? (fun as any).run(args.map((arg: Node) => arg.value)) : this.callEvaluator(fun.run as Node[]);
+
         this.addOutput = `Function "${functionName}" called with arguments: ${JSON.stringify(args)}`;
         this.addOutput = `${functionName} output: ${JSON.stringify(output)}\n`;
         return output;
 
+    }
+
+    private callEvaluator(tree: Node[]): string {
+        const output = new Evaluator(tree).output;
+        this.addOutput = `Calling new evaluator with tree: ${JSON.stringify(tree)}\nOutput: ${output}`;
+        return output;
     }
 
     /**

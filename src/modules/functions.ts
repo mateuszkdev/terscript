@@ -56,7 +56,7 @@ export class Functions {
      * @returns {boolean} If the function exists.
      */
     public isFunction(name: string): boolean {
-        return this.functions.has(name);
+        return this.functions.has(name) || this.processFunctions.has(name);
     }
 
     /**

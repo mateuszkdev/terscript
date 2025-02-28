@@ -1,10 +1,10 @@
 pomarancza = 10
 
 pomidor(x) {
-    log(x, "czerwony")
+    log("czerwony")
 }
 
-y = variables()
+a = 1
 
+variables()
 pomidor("fajny")
-log(y)
