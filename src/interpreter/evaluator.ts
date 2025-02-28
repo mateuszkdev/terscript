@@ -2,13 +2,15 @@ import { Node } from '../types/Parser';
 import { STORAGE, FUNCTIONS, isDebug } from '../index';
 import { FunctionDeclaration } from 'types/Functions';
 
+const DEBUG: boolean = false;
+
 /**
  * @name Evaluator
  * @description Evaluate the tree
  */
 export class Evaluator {
 
-    private debug = (x: any, c: string) => isDebug && console.log(x, c);
+    private debug = (x: any, c: string) => (isDebug && DEBUG) && console.log(x, c);
 
     /* VARIABLES */
     private tree: Node[] = [];

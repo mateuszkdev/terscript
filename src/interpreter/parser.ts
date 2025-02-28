@@ -1,14 +1,20 @@
 import { Token, Node } from '../types/Parser';
 import { operators } from '../utility/operators';
 import { charset } from '../utility/charset';
+import { isDebug } from '../index';
 
 import String from './parser/string';
+
+const DEBUG: boolean = true;
 
 /**
  * @name Parser
  * @description The Parser class is responsible for converting the list of tokens into a list of nodes.
  */
 export class Parser {
+
+    private debug = (x: any, c: string) => (isDebug && DEBUG) && console.log(x, c);
+    #i = 0;
 
     /* VARIABLES */
     private power: boolean = true;
@@ -37,6 +43,7 @@ export class Parser {
         this.power = true;
         this.tokens = tmpTokens;
         this.index = -1;
+        this.clearTokens(); // clear the tokens
 
         // console.log(this.tokens) // test log
 
@@ -54,6 +61,8 @@ export class Parser {
      * @returns {Node | boolean} The next node.
      */
     private parse(): Node | boolean {
+
+        this.debug(this.current, `parse call ${++this.#i}`) // debug log;
 
         /* Check if program should sotp and skipping whitechars */
         if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') return this.power = false;
@@ -83,6 +92,8 @@ export class Parser {
      */
     private parseMath(): Node {
 
+        this.debug(this.current, 'parseMath call') // debug log;
+
         return { type: 'math', value: this.current.type, children: [this.lastToken, this.parse() as Node] }
 
     }
@@ -94,10 +105,12 @@ export class Parser {
      */
     private parseArguments(): Node {
         
+        this.debug(this.current, 'parseArguments call') // debug log;
+
         let args: Node[] = [];
         let pwr: boolean = true;
         while (pwr) {
-
+            
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean') { this.next(); pwr = false; }
             
             if (this.checkNextToken.type == 'leftParenthesis') { this.next(); args.push(this.parseArguments()); };
@@ -124,11 +137,14 @@ export class Parser {
      */
     private parseBrances(): Node {
 
+        this.debug(this.current, 'parseBrances call') // debug log;
+
         let brances: Node[] = [];
         let pwr: boolean = true;
 
         while (pwr) {
 
+            console.log(this.current, this.checkNextToken)
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean' || !this.checkNextToken) { this.next(); pwr = false; break; }
             if (this.checkNextToken.type == 'leftBrace') throw new Error('Braces are not allowed in braces');
             if (this.checkNextToken.type == 'rightBrace') { this.next(); pwr = false; }
@@ -148,6 +164,8 @@ export class Parser {
      */
     private parseString(): Node {
 
+        this.debug(this.current, 'parseString call') // debug log;
+
         const string = new String(this.scaleTokens()); // parse the string
         this.updateIndex(string.index); // update the index
         if (this.tokens.slice(this.index)[0].type == 'quote') this.next(); // fix the index
@@ -162,6 +180,8 @@ export class Parser {
      * @returns {Node} Parsed Assign
      */
     private parseAssign(): Node {
+
+        this.debug(this.current, 'parseAssign call') // debug log;
 
         this.tree.pop();
         return { type: 'assign', value: '=', children: [this.lastToken, this.parse() as Token] };
@@ -201,7 +221,7 @@ export class Parser {
         let next = this.tokens[this.index + (1 + i)];
 
         if (!next || !next.type) { this.power = false; return { type: 'undefined', value: '', line: 0, index: 0 }; } // check if the next token is undefined
-        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter' || next.type == 'carriageReturn') { // check if the next token is a whitechar
+        if (next.type == 'space' || next.type == 'tab' || next.type == 'enter' || next.type == 'carriageReturn') { // check if the next token is a whitechar ( there is no need due to the clearTokens method but better to be prepared)
             this.index++;
             return this.next();
         }
@@ -240,6 +260,17 @@ export class Parser {
 
         }
         
+    }
+
+    /**
+     * @name clearTokens
+     * @description The clearTokens method is responsible for clearing the tokens.
+     * @returns {void} 
+     */
+    private clearTokens(): void {
+
+        this.debug('clearTokens call', 'clearTokens call') // debug log;
+        this.tokens = this.tokens.filter(t => t.type != 'space' && t.type != 'tab' && t.type != 'enter' && t.type != 'carriageReturn');
 
     }
 
