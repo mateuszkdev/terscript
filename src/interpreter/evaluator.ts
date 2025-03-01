@@ -66,7 +66,7 @@ export class Evaluator {
             case 'identifier': return this.identifier(this.current); // Identifying rest of the nodes
             case 'math': return this.itsMath(this.current); // Evaluating math
             case 'number': return this.evaluate(); // Returning a number
-            case 'string': return this.evaluate(); // Returning a string
+            case 'string': return this.itsString(this.current); // Returning a string
 
         }
 
@@ -83,15 +83,31 @@ export class Evaluator {
     private identifier(node: Node): Node | void {
         
         this.debug(node, `identifier call`)
+
         if (node.type === 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
         else if (node.type === 'math') return this.itsMath(node) // Evaluating math
         else if (node.type === 'arguments') return node; // Returning arguments
-        else if (node.type === 'string') return node; // Returning a string
+        else if (node.type === 'string') return this.itsString(node); // Returning a string
         else if (node.type === 'number') return node; // Returning a number
         else if (this.checkFunctionDeclarationNodes(node)) return this.itsFunction(node); // Checking if the node is a function declaration
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (typeof node === 'boolean') return node; // Returning a boolean
         else this.itsVariable(node); // Returning a variable
+
+    }
+
+    /**
+     * @name itsString
+     * @description Evaluate a string
+     * @param {Node} node The string node
+     * @returns {Node}
+     */
+    private itsString(node: Node): Node {
+        
+        this.debug(node, `itsString call`)
+
+        if (this.checkStringConstants(node)) return this.replaceStringConstants(node);
+        return node;
 
     }
 
@@ -115,6 +131,37 @@ export class Evaluator {
         
         this.addOutput = `Math expression "${value}" evaluated to: ${num}`;
         return { type: 'number', value: `${num}`, children: [] };
+
+    }
+
+    /**
+     * @name checkStringConstants
+     * @description Check if the string has constants
+     * @param {Node} node The node to check
+     * @returns {boolean} If the string has constants
+     */
+    private checkStringConstants(node: Node): boolean {
+        return !!new RegExp('@').test(node.value);
+    }
+
+    private replaceStringConstants(node: Node): Node {
+
+        let str = node.value;
+
+        const elements = /\s/g.test(str) ? str.split(/\s+/) : [str];
+        elements.forEach((element: string) => {
+            if (new RegExp('@').test(element)) {
+
+                const variableName = element.replace('@', '');
+                const variable = STORAGE.getVariable(variableName);
+                str = str.replace(`@${variableName}`, variable.value);
+
+            }
+        });
+
+        // console.log(str)
+
+        return { type: 'string', value: str, children: [] };
 
     }
 
@@ -330,11 +377,12 @@ export class Evaluator {
         // const lastNode = this.tree[this.index - 1] || { type: 'undefined' };
         const nextNode = this.checkNextNode;
 
-        // console.log(this.current, lastNode, nextNode, 1)
+        this.debug(currentNode, `skipNode call`)
         if (currentNode && currentNode.type == 'identifier') {
             // console.log(2)
             if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) this.current = this.next() as Node;
-        } else this.current = this.next() as Node;
+        } 
+        // else this.current = this.next() as Node;
 
     }
 

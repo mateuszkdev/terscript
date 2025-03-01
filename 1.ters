@@ -1,0 +1,4 @@
+color = "red"
+vehicle = "car"
+
+log("This @vehicle is @color")

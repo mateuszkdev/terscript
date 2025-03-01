@@ -16,6 +16,8 @@ export const operators = {
     rightParenthesis: [/\)/],
     leftBrace: [/\{/],
     rightBrace: [/\}/],
+    variableInString: [/@/]
+
 }
 
 export const comments = {

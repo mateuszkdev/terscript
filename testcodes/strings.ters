@@ -1,5 +1,5 @@
-x = "To jest string"
+color = "red"
+vehicle = "car"
 
-log("To tez jest string")
+log("This @vehicle is @color")
 
-log(x)

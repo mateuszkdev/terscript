@@ -29,7 +29,11 @@ export default class String {
         
         this.current = this.tokens[++this.index];
         if (operators.quote.some(r => r.test(this.current.value))) this.power = false;
-        else this.value += `${this.current.value} `;
+        else {
+            let v = this.current.value;
+            if (this.current.type == 'variableInString') this.value += v;
+            else this.value += `${this.current.value} `;
+        }
         
     }
 
