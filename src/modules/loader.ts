@@ -8,7 +8,8 @@ import { isDev } from '../index';
  */
 export default (file: string) => {
 
-    const filePath = `${__dirname}/../../${file}${conf.extension}`;
+
+    const filePath = `${__dirname}/../../${file.replace('./', '')}${conf.extension}`;
     isDev && console.log(`'\n :: Loading ${filePath} ::`);
     if (!existsSync(filePath)) throw new Error("LoaderError: File or directory not found");
     return readFileSync(filePath, 'utf8');

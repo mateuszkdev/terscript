@@ -1,12 +1,7 @@
-# log("cool") # Single line comment
+import "./testcodes/math"
+import "./testcodes/strings"
 
-/* 
+log("Function output from math file:")
+add()
 
-    log(12)
-    Multi line comment
-
-*/
-
-log(1)
-log("ok")
-log(20)
+log("cool")

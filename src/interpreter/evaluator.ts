@@ -2,6 +2,10 @@ import { Node } from '../types/Parser';
 import { STORAGE, FUNCTIONS, isDebug, debugFile } from '../index';
 import { FunctionDeclaration } from 'types/Functions';
 
+import load from '../modules/loader';
+import { Lexer } from './lexer';
+import { Parser } from './parser';
+
 /**
  * @name Evaluator
  * @description Evaluate the tree
@@ -84,6 +88,8 @@ export class Evaluator {
         
         this.debug(node, `identifier call`)
 
+        if (node.type === 'identifier' && node.value === 'import') return this.itsImport(node);
+
         if (node.type === 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
         else if (node.type === 'math') return this.itsMath(node) // Evaluating math
         else if (node.type === 'arguments') return node; // Returning arguments
@@ -93,6 +99,26 @@ export class Evaluator {
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (typeof node === 'boolean') return node; // Returning a boolean
         else this.itsVariable(node); // Returning a variable
+
+    }
+
+    /**
+     * @name itsImport
+     * @description Import another file
+     * @param {Node} node
+     */
+    private itsImport(node: Node): void {
+
+        this.debug(node, 'itsImport call')
+
+        if (this.checkNextNode.type !== 'string') throw new Error('import requires string path');
+
+        const path = ((this.next() as Node).value).replace(/\s+/gmi, '');
+
+        const code = load(path);
+        const lexer = new Lexer(code);
+        const parser = new Parser(lexer.tokens);
+        const evaluator = new Evaluator(parser.tree);
 
     }
 
