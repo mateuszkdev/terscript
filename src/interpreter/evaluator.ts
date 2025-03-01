@@ -381,7 +381,10 @@ export class Evaluator {
         if (currentNode && currentNode.type == 'identifier') {
             // console.log(2)
             if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) this.current = this.next() as Node;
-        } 
+        }
+
+        if (currentNode && !currentNode.type) this.next();
+
         // else this.current = this.next() as Node;
 
     }

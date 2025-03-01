@@ -1,4 +1,12 @@
-color = "red"
-vehicle = "car"
+# log("cool") # Single line comment
 
-log("This @vehicle is @color")
+/* 
+
+    log(12)
+    Multi line comment
+
+*/
+
+log(1)
+log("ok")
+log(20)

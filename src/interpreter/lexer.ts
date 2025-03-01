@@ -34,8 +34,6 @@ export class Lexer {
             this.tokens.push(this.organizeToken(tmp)); // Push the next organized token
         }
 
-        this.debug(this.tokens, 'tokens');
-
     }
 
     /**
@@ -85,8 +83,10 @@ export class Lexer {
         }
 
         if (tmp == undefined && (this.code[this.index + 1] && this.code[this.index + 2])) { 
+            this.debug('Block Comment', 'next call');
 
             if (new RegExp('\\/').test(this.code[this.index + 1]) && new RegExp('\\*').test(this.code[this.index + 2])) { // Block Comment Start
+
                 this.index += 2;
 
                 while (true) {
@@ -96,7 +96,7 @@ export class Lexer {
                     this.index++;
 
                 }
-
+                 this.index += 2;
                 return this.next();
 
             }
