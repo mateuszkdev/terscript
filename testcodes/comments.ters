@@ -1,7 +1,12 @@
-# Single line comment
+# log("cool") # Single line comment
 
 /* 
 
- Multi line comment
+    log(12)
+    Multi line comment
 
 */
+
+log(1)
+log("ok")
+log(20)

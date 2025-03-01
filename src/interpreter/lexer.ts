@@ -84,6 +84,25 @@ export class Lexer {
             return this.next();
         }
 
+        if (tmp == undefined && (this.code[this.index + 1] && this.code[this.index + 2])) { 
+
+            if (new RegExp('\\/').test(this.code[this.index + 1]) && new RegExp('\\*').test(this.code[this.index + 2])) { // Block Comment Start
+                this.index += 2;
+
+                while (true) {
+
+                    if (this.code[this.index + 1] == undefined) break;
+                    if (new RegExp('\\*').test(this.code[this.index + 1]) && new RegExp('\\/').test(this.code[this.index + 2])) break;
+                    this.index++;
+
+                }
+
+                return this.next();
+
+            }
+
+        }
+
         (tmp == undefined) && Object.entries(operators).forEach(o => o[1].some(r => r.test(this.code[this.index + 1]) && (tmp = o[0]))); // Operators
         (tmp == undefined) && Object.entries(charset).forEach(c => (c[1].test(this.code[this.index + 1]) && (tmp = c[0]))); // Charset
 
