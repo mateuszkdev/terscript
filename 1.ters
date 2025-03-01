@@ -1,5 +1,4 @@
-# declaring function
-pomidor() {
+pomidor() { # declaring function
 
     log("pomidor jest czerwony")
 
@@ -22,8 +21,14 @@ jedzenie() {
 
 }
 
-# calling function also # is comment
-#jedzenie()
+#jedzenie() # calling function also # is comment
 
-# math bad parsing, cuting half of the operation
-2+2+2/10+21+1+1
+
+# x = math() # @TODO fix assign function output ( have to create return statement )
+# x = 2 + 2 # @TODO fix assign numbers parsing
+# log(x) # @TODO fix function arguments-variables evaluating
+
+math() { 
+    log(2+2+2/10+21+1+1)
+}
+math()

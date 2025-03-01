@@ -56,7 +56,7 @@ export class Evaluator {
         this.current = this.next() as Node;
         this.skipNode(); // Skip a node if needed
 
-        if (typeof this.checkNextNode == 'undefined' || typeof this.checkNextNode == 'boolean') return this.power = false; // Check if the program should stop
+        if (typeof this.current == 'undefined' || typeof this.current == 'boolean') return this.power = false; // Check if the program should stop
 
         this.debug(this.current, `evaluate call`)
 
@@ -65,8 +65,8 @@ export class Evaluator {
             case 'assign': { return this.assign(this.current.children![0].value, this.current.children![1] as Node); } // Assigning a variable
             case 'identifier': return this.identifier(this.current); // Identifying rest of the nodes
             case 'math': return this.itsMath(this.current); // Evaluating math
-            case 'number': return this.current; // Returning a number
-            case 'string': return this.current; // Returning a string
+            case 'number': return this.evaluate(); // Returning a number
+            case 'string': return this.evaluate(); // Returning a string
 
         }
 
@@ -103,11 +103,18 @@ export class Evaluator {
      */
     private itsMath(node: Node): Node {
 
+        this.debug(node, `itsMath call`)
+
         let value = '';
 
-        console.log(node)
+        node.children?.forEach((child: Node) => {
+            value += child.value;
+        });
 
-        return { type: 'number', value: eval(value) }
+        const num = eval(value);
+        
+        this.addOutput = `Math expression "${value}" evaluated to: ${num}`;
+        return { type: 'number', value: `${num}`, children: [] };
 
     }
 

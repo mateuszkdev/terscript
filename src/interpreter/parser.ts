@@ -98,10 +98,12 @@ export class Parser {
         const maths: Node[] = [];
         maths.push(this.lastToken, this.current, this.next());
 
+        // if (this.lastToken === this.tokens[this.index - 1]) this.tokens.shift(); // remove the last token from the tokens array
+
         while (true) {
   
             if (this.checkNextToken.type === 'number' || this.checkNextToken.type === 'add' || this.checkNextToken.type === 'subtract' || this.checkNextToken.type === 'multiply' || this.checkNextToken.type === 'divide') {
-                
+
                 maths.push(this.next(), this.next())
 
             } else break;
@@ -142,6 +144,9 @@ export class Parser {
             else args.push(this.parse() as Node);
 
         }
+
+        if (args.some(a => a.type == 'math')) args.shift();
+
         this.debug({ type: 'arguments', value: '', children: args }, 'arguments output')
         return { type: 'arguments', value: '', children: args };
 
