@@ -5,7 +5,7 @@
     "main": "build/index.js",
     "scripts": {
         "dev": "node ./build/index.js --file 1 --dev true",
-        "test": "node ./build/index.js --file 1",
+        "test": "node ./build/index.js --test true",
         "debug": "node ./build/index.js --file 1 --debug true"
     },
     "author": "Mateusz4711 (https://github.com/mateuszkdev)",

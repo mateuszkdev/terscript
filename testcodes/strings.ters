@@ -1,0 +1,5 @@
+x = "To jest string"
+
+log("To tez jest string")
+
+log(x)

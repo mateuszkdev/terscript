@@ -1,7 +1,6 @@
 pomidor() { # declaring function
 
     log("pomidor jest czerwony")
-
     log(1+1)
 
     # function inside function ( not working for now correctly )
@@ -22,7 +21,6 @@ jedzenie() {
 }
 
 #jedzenie() # calling function also # is comment
-
 
 # x = math() # @TODO fix assign function output ( have to create return statement )
 # x = 2 + 2 # @TODO fix assign numbers parsing

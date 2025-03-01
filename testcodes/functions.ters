@@ -1,0 +1,16 @@
+myFunction() {
+    log("Hello World!")
+}
+
+car() {
+    log("Car is red, and it power up to:")
+    log(100 + 100, "HP!")
+}
+
+vahicles() {
+    log("Car:")
+    car()
+}
+
+myFunction()
+vahicles()

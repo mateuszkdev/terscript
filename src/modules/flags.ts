@@ -17,8 +17,9 @@ class Flags {
             .filter(e => /\s+/.test(e))
             .map(e => e.split(' '))
             .forEach(e => this.flags[e[0]] = e[1]);
-        
+
         this.flags.debug && (this.flags.debugFile = process.argv[6])
+        this.flags.test && (this.flags.file = `testcodes/${process.argv[4]}`)
 
     }
 
