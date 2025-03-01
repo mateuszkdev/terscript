@@ -95,7 +95,22 @@ export class Parser {
 
         this.debug(this.current, 'parseMath call') // debug log;
 
-        return { type: 'math', value: this.current.type, children: [this.lastToken, this.parse() as Node] }
+        const maths: Node[] = [];
+        maths.push(this.lastToken, this.current, this.next());
+
+        while (true) {
+  
+            if (this.checkNextToken.type === 'number' || this.checkNextToken.type === 'add' || this.checkNextToken.type === 'subtract' || this.checkNextToken.type === 'multiply' || this.checkNextToken.type === 'divide') {
+                
+                maths.push(this.next(), this.next())
+
+            } else break;
+
+        }   
+
+        const math: Node = { type: 'math', value: '', children: maths }
+        this.debug(math, 'math output')
+        return math;
 
     }
 

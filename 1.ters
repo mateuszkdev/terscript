@@ -1,21 +1,29 @@
+# declaring function
 pomidor() {
 
     log("pomidor jest czerwony")
 
-    #log(1+1)
+    log(1+1)
 
+    # function inside function ( not working for now correctly )
     marchewka() {
         log("Marchewka jest pomaranczowa")
     }
+    # marchewka()
 
 }
 
 jedzenie() {
 
+    log("Jakie sa jedzenia?")
     pomidor()
-    #marchewka()
+    marchewka() # using function declared in another function
+    # in future it will be possible only by using global keyword
 
 }
 
-log("Jakie sa jedzenia?")
-jedzenie()
+# calling function also # is comment
+#jedzenie()
+
+# math bad parsing, cuting half of the operation
+2+2+2/10+21+1+1

@@ -64,7 +64,9 @@ export class Evaluator {
 
             case 'assign': { return this.assign(this.current.children![0].value, this.current.children![1] as Node); } // Assigning a variable
             case 'identifier': return this.identifier(this.current); // Identifying rest of the nodes
-
+            case 'math': return this.itsMath(this.current); // Evaluating math
+            case 'number': return this.current; // Returning a number
+            case 'string': return this.current; // Returning a string
 
         }
 
@@ -79,16 +81,16 @@ export class Evaluator {
      * @returns {void}
      */
     private identifier(node: Node): Node | void {
-
+        
         this.debug(node, `identifier call`)
-        if (node.type == 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
-        else if (node.type == 'add' || node.type == 'subtract' || node.type == 'multiply' || node.type == 'divide') return this.isMath(node)
-        else if (node.type == 'arguments') return node; // Returning arguments
-        else if (node.type == 'string') return node; // Returning a string
-        else if (node.type == 'number') return node; // Returning a number
+        if (node.type === 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
+        else if (node.type === 'math') return this.itsMath(node) // Evaluating math
+        else if (node.type === 'arguments') return node; // Returning arguments
+        else if (node.type === 'string') return node; // Returning a string
+        else if (node.type === 'number') return node; // Returning a number
         else if (this.checkFunctionDeclarationNodes(node)) return this.itsFunction(node); // Checking if the node is a function declaration
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
-        else if (typeof node == 'boolean') return node; // Returning a boolean
+        else if (typeof node === 'boolean') return node; // Returning a boolean
         else this.itsVariable(node); // Returning a variable
 
     }
@@ -99,7 +101,7 @@ export class Evaluator {
      * @param {Node} node The math node 
      * @returb {Node}
      */
-    private isMath(node: Node): Node {
+    private itsMath(node: Node): Node {
 
         let value = '';
 
