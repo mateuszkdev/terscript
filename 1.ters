@@ -7,8 +7,8 @@
 #add()
 z = log("X")
 x = compare(1 23)
-y = compare(1 23)
-log(x)
+y = variables()
+log(y)
 #log(y) #TODO napraiwc bo cos nie dziala, nie wiem, ucina ostatnie node z tree albo nie wiem co bo nie dziala logowanie zmiennej y ale dziala x a jak zakomenujte oba logi to ten ostatni nie dziala xd 
 
 log('----')
