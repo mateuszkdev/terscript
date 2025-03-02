@@ -91,6 +91,7 @@ export class Evaluator {
         if (node.type === 'identifier' && node.value === 'import') return this.itsImport(node);
 
         if (node.type === 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
+        else if (STORAGE.memory.has(node.value)) return this.itsVariable(node); // Returning a variable
         else if (node.type === 'math') return this.itsMath(node) // Evaluating math
         else if (node.type === 'arguments') return node; // Returning arguments
         else if (node.type === 'string') return this.itsString(node); // Returning a string
@@ -198,12 +199,13 @@ export class Evaluator {
      * @returns {boolean} If the function is correctly declared
      */
     private checkFunctionDeclarationNodes(node: Node): boolean {
-
+        
         this.debug(node, `checkFunctionDeclarationNodes call`);
 
         if (node.type != 'identifier') return false;
 
         if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) {
+            
             if (!this.checkNextNode || !this.tree[this.index + 2]) { return false; }
 
             if (this.checkNextNode.type == 'arguments' && this.tree[this.index + 2].type == 'braces') { return true; }
@@ -225,10 +227,11 @@ export class Evaluator {
      * @throws {Error} If the function does not have braces
      */
     private checkFunctionDeclaration(node: Node): boolean {
-
+        let x = 0
         this.debug(node, `checkFunctionDeclaration call`);
 
         if (FUNCTIONS.isFunction(node.value)) return true; // Check if the function is declared
+
         if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) { // Check if the function has arguments
 
             const functionData: FunctionDeclaration = { name: node.value, args: [], run: [] };
@@ -245,7 +248,7 @@ export class Evaluator {
             this.addOutput = `Function "${functionData.name}" declared with arguments:\n${JSON.stringify(functionData.args)}\nand exec:\n${JSON.stringify(functionData.run)}\n`; // Adding to the output
 
         } else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
-
+  
         return false;
 
     }
@@ -258,6 +261,7 @@ export class Evaluator {
     private itsFunction(node: Node): any {
 
         this.debug(node, `itsFunction call`)
+
         if (this.checkFunctionDeclaration(node)) { // Check if the function is declared, if not declare it and skip function execution
             let args = [] as Node[];
 
@@ -267,12 +271,11 @@ export class Evaluator {
                 }
                 else if (this.checkNextNode.type == 'arguments') {
                     args = (this.next() as Node).children!; // Getting the arguments from next node
+                    args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined); // Parse the arguments
                 }
                 else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
             }
-
-
-            if (args.some((arg: Node) => arg.type == 'identifier' || arg.type == 'arguments')) { // Check if the arguments are functions with arguments
+            else if (args.some((arg: Node) => arg.type == 'identifier' || arg.type == 'arguments')) { // Check if the arguments are functions with arguments
 
                 let newArgs = [];
                 for (let i = 0; i <= args.length; i++) {
@@ -295,6 +298,7 @@ export class Evaluator {
             return this.callFunction(node.value, args); // Calling the function and returning output
 
         }
+
     }
 
     /**
@@ -310,7 +314,7 @@ export class Evaluator {
         const isProcessFunction = typeof fun.run !== 'function'; // Check if the function is a process function
 
         const output = !isProcessFunction ? (fun as any).run(args.map((arg: Node) => arg.value)) : this.callEvaluator(fun.run as Node[]);
-
+        // console.log({ output, isProcessFunction, fun, args })
         this.addOutput = `Function "${functionName}" called with arguments: ${JSON.stringify(args)}`;
         this.addOutput = `${functionName} output: ${JSON.stringify(output)}\n`;
         return output;
@@ -360,18 +364,24 @@ export class Evaluator {
     private assign(name: string, value: Node): Node {
 
         // console.log(name, value)
+        // console.log({ c: this.current, n: this.checkNextNode, nn: this.tree[this.index + 2], nnn: this.tree[this.index+3] })
         // console.log(this.checkNextNode)
         if (FUNCTIONS.isFunction(value.value)) { // Check if the value is a function
 
             const nextNode = this.next() as Node;
             if (nextNode.type == 'arguments') { // Check if the function has arguments
 
-                value.children?.push(nextNode); // Add the arguments to the function
-                this.current = this.next() as Node; // Skip the arguments
+                // console.log({ value, ch: value.children, x: "XD" })
+                value = this.callFunction(value.value, nextNode.children!) // Call the function
+                // console.log({ o })
+                this.next(); // Skip the arguments
 
             } else throw new Error(`Function ${value.value} requires arguments.`); // Throw an error if the function does not have arguments
 
         }
+
+        this.next();
+        // console.log({ c: this.current, n: this.checkNextNode, nn: this.tree[this.index + 2], nnn: this.tree[this.index+3] })
         STORAGE.setVariable = { name, value };
         this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
         return value;

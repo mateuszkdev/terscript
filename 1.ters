@@ -1,7 +1,14 @@
-import "./testcodes/math"
-import "./testcodes/strings"
+#import "./testcodes/strings.ters"
+#import "./testcodes/math"
 
-log("Function output from math file:")
-add()
+#log(2 + 2)
+#log("pomidor")
 
-log("cool")
+#add()
+z = log("X")
+x = compare(1 23)
+y = compare(1 23)
+log(x)
+#log(y) #TODO napraiwc bo cos nie dziala, nie wiem, ucina ostatnie node z tree albo nie wiem co bo nie dziala logowanie zmiennej y ale dziala x a jak zakomenujte oba logi to ten ostatni nie dziala xd 
+
+log('----')

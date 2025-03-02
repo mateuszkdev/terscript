@@ -13,6 +13,14 @@ export default {
                 console.log(...args);
                 return args;
             }
+        },
+        {
+            name: 'clear',
+            description: 'Clear console',
+            usage: 'clear()',
+            run: () => {
+                console.clear();
+            }
         }
     ]
 

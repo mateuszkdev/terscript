@@ -1,5 +1,4 @@
 color = "red"
 vehicle = "car"
 
-log("This @vehicle is @color")
-
+log("This @vehicle @color is @color")

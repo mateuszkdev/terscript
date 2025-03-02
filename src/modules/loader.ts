@@ -8,6 +8,7 @@ import { isDev } from '../index';
  */
 export default (file: string) => {
 
+    new RegExp('.ters').test(file) ? file = file.replace('.ters', '') : null;
 
     const filePath = `${__dirname}/../../${file.replace('./', '')}${conf.extension}`;
     isDev && console.log(`'\n :: Loading ${filePath} ::`);
