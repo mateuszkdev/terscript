@@ -20,7 +20,11 @@ export const operators = {
     lessThan: [/\</],
     greaterThan: [/\>/],
     dot: [/\./],
-    modulus: [/\%/]
+    modulus: [/\%/],
+    colon: [/\:/],
+    semicolon: [/\;/],
+    exclamation: [/\!/],
+    question: [/\?/],
 }
 
 export const comments = {

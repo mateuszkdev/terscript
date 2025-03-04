@@ -1,35 +1,9 @@
-import "./testcodes/functions"
-
-displayZ() {
-    log("Hello World ! @z")
-}
-
-condition = true
-x = 0
-
-tomato() {
-
-    log("")
-    log("Number is : @x")
-
-    if (condition) {
-    
-        z = "Whats up ?"
-    
-        displayZ()
-    
-    } else {
-        car()
+car = {
+    brand: "DODGE",
+    model: "CHALLENGER",
+    year: 2015,
+    isUsed: true,
+    displayInfo: () {
+        log("@brand @model @year @isUsed")
     }
-
-}
-
-for (10) {
-    x = i
-    if (condition) {
-        condition = false tomato()
-    } else {
-        condition = true tomato()
-    }
-
 }

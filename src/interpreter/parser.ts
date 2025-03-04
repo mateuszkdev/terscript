@@ -84,7 +84,24 @@ export class Parser {
         else if (this.current.type == 'assign') return this.parseAssign();
         else if (this.current.type == 'leftParenthesis') return this.parseArguments();
         else if (this.current.type == 'leftBrace') return this.parseBraces();
+        else if (this.current.type == 'colon') return this.current;
+        else if (this.current.type == 'comma') return this.current;
         else return this.parse();
+
+    }
+
+    /**
+     * @name itsObject
+     * @description The itsObject method is responsible for creating the object is an object.
+     */
+    private itsObject(): Node {
+
+        this.debug(this.current, 'itsObject call');
+
+        const objectNodes: Node[] = this.parseBraces().children![0].children as Node[];
+        console.log({ objectNodes })
+
+        return { type: 'object', value: '', children: [] };
 
     }
 
@@ -229,6 +246,10 @@ export class Parser {
     private parseAssign(): Node {
 
         this.debug(this.current, 'parseAssign call') // debug log;
+        console.log({ c: this.current, n: this.checkNextToken })
+        if (this.checkNextToken.type == 'leftBrace') return {
+            type: 'assign', value: '=', children: [this.lastToken, this.itsObject()]
+        }
 
         // this.tree.pop();
         return { type: 'assign', value: '=', children: [this.lastToken, this.parse() as Token] };
