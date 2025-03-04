@@ -113,7 +113,7 @@ export class Parser {
 
         while (true) {
   
-            if (this.checkNextToken.type === 'number' || this.checkNextToken.type === 'add' || this.checkNextToken.type === 'subtract' || this.checkNextToken.type === 'multiply' || this.checkNextToken.type === 'divide') {
+            if (this.checkMath(this.checkNextToken)) {
 
                 maths.push(this.next(), this.next())
 
