@@ -102,7 +102,7 @@ export class Evaluator {
         else if (node.type === 'number') return node; // Returning a number
         else if (this.checkFunctionDeclarationNodes(node)) return this.itsFunction(node); // Checking if the node is a function declaration
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
-        else if (typeof node === 'boolean') return node; // Returning a boolean
+        else if (node.type === 'boolean') return node; // Returning a boolean
         else this.itsVariable(node); // Returning a variable
 
     }

@@ -5,6 +5,7 @@ displayZ() {
 }
 
 x = "Sad"
+y = 1.2 + 2.2 * 2.25
 
 if (true) {
     
@@ -15,6 +16,8 @@ if (true) {
     display() {
         log("Well Hello! Fine")
     }
+
+    log("Number is: @y")
 
 }
 

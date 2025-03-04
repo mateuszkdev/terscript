@@ -1,7 +1,9 @@
 add() {
-    log(2+2)
+    log(2+2.2)
 }
 
 divide() {
     log(10-1)
 }
+
+add()
