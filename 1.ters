@@ -11,10 +11,10 @@ j = variables() #
 
 log("test0") # wypisuje "test0" ale nie wypisuje "test1", ponownie po assign pomija kolejna 2 z rzedu opereacje
 log("test1") # tutaj wywala ale nie wiem czy tu czy nizej ze variable undefined nie istnieje
-log(j)
+log(h)/*
 log(1)
 log(2) # tutaj wypisuje zmienna J oraz wszystkie liczby od 1 do 4, ponizej evaluator nie pomija tych operacji, problem jest w assign 
 log(3)
-log(4)
+log(4)*/
 
 log('----')

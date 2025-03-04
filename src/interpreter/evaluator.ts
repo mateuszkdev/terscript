@@ -365,7 +365,7 @@ export class Evaluator {
      * @description Assign a variable
      * @returns {void}
      */
-    private assign(name: string, value: Node): Node {
+    private assign(name: string, value: Node): Node { // @TODO Fix this method, sometimes skipping nodes and not assigning variables
 
         // console.log(name, value)
         // console.log({ c: this.current, n: this.checkNextNode, nn: this.tree[this.index + 2], nnn: this.tree[this.index+3] })
