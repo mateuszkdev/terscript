@@ -40,4 +40,16 @@ export class Storage {
 
     }
 
+    /**
+     * @name removeVariable
+     * @description The removeVariable method is responsible for removing a variable.
+     * @param {string} name The name of the variable.
+     */
+    public removeVariable(name: string): void {
+        
+        if (!this.memory.has(name)) throw new Error(`Variable ${name} does not exist.`);
+        this.memory.delete(name);
+        
+    }
+
 }

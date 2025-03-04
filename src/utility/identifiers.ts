@@ -14,5 +14,9 @@ export const identifiers = {
             description: 'Else statement',
             usage: 'if (condidont) {} else { code }'
         },
+        for: {
+            description: 'For loop',
+            usage: 'for(10) / for([elements]) / for(i = 5, 10)'
+        }
     }
 }

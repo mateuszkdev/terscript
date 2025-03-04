@@ -4,31 +4,32 @@ displayZ() {
     log("Hello World! @z")
 }
 
-x = "Sad"
-y = 1.2 + 2.2 * 2.25
+condition = true
+x = 0
 
-if (true) {
+tomato() {
+
+    log("")
+    log("Number is: @x")
+
+    if (condition) {
     
-    z = "Whats up?"
-
-    displayZ()
-
-    display() {
-        log("Well Hello! Fine")
+        z = "Whats up?"
+    
+        displayZ()
+    
+    } else {
+        car()
     }
-
-    log("Number is: @y")
 
 }
 
-if (false) {
-
-    log(x)
-
-} else {
-
-    display()
-    log("and")
-    vehicles()
+for (10) {
+    x = i
+    if (condition) {
+        condition = false tomato()
+    } else {
+        condition = true tomato()
+    }
 
 }

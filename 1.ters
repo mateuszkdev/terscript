@@ -1,9 +1,35 @@
-x = 1.2 + 2.2 * 2.25
+import "./testcodes/functions"
 
-log(x)
+displayZ() {
+    log("Hello World! @z")
+}
 
-if (x) {
-    log("Cool")
-} else {
-    log("Sad")
+condition = true
+x = 0
+
+tomato() {
+
+    log("")
+    log("Number is: @x")
+
+    if (condition) {
+    
+        z = "Whats up?"
+    
+        displayZ()
+    
+    } else {
+        car()
+    }
+
+}
+
+for (10) {
+    x = i
+    if (condition) {
+        condition = false tomato()
+    } else {
+        condition = true tomato()
+    }
+
 }

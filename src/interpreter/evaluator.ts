@@ -6,7 +6,7 @@ import load from '../modules/loader';
 import { Lexer } from './lexer';
 import { Parser } from './parser';
 
-const test = (x: any) => true && console.log(x);
+const test = (x: any) => false && console.log(x);
 
 /**
  * @name Evaluator
@@ -118,7 +118,41 @@ export class Evaluator {
         this.debug(node, 'itsCondition call');
 
         if (node.value === 'if') return this.ifCondition(node);
+        if (node.value === 'for') return this.forLoop(node);
         
+    }
+
+    private forLoop(node: Node): void {
+
+        if (this.checkNextNode.type !== 'arguments') throw new Error('for requires arguments');
+        const args = this.next() as Node;
+
+        if (this.tree[this.index + 1].type !== 'braces') throw new Error('for requires braces');
+        const braces = this.next() as Node;
+
+        let variableName = 'i';
+        let max: number;
+        let step: number;
+
+        if (args.children?.length == 1) { // for (max)
+
+            step = 0;
+            max = parseInt(args.children[0].value);
+
+            // adding variables to storage for the loop to use
+            STORAGE.setVariable = { name: variableName, value: { type: 'number', value: `${step}`, children: [] } };
+
+            for (step; step < max; step++) {
+                STORAGE.setVariable = { name: variableName, value: { type: 'number', value: `${step}`, children: [] } };
+                new Evaluator(braces.children!);
+            }
+
+            // removing the variable from storage
+            STORAGE.memory.delete(variableName);
+            
+        }
+
+
     }
 
     /**
@@ -234,11 +268,12 @@ export class Evaluator {
         let value = '';
 
         node.children?.forEach((child: Node) => {
-            value += child.value;
+            if (STORAGE.memory.has(child.value)) value += STORAGE.getVariable(child.value).value;
+            else value += child.value;
         });
 
         const output = eval(value);
-        
+
         this.addOutput = `Math expression "${value}" evaluated to: ${output}`;
         if (typeof output === 'boolean') return { type: 'boolean', value: `${output}`, children: [] };
         else return { type: 'number', value: `${output}`, children: [] };
@@ -456,7 +491,7 @@ export class Evaluator {
      * @returns {void}
      */
     private assign(name: string, value: Node): Node { // @TODO Fix this method, sometimes skipping nodes and not assigning variables
-        // test({ newAssign: { name, value } })
+        test({ newAssign: { name, value } })
 
         if (FUNCTIONS.isFunction(value.value)) { // Check if the value is a function
 
@@ -472,8 +507,11 @@ export class Evaluator {
 
         }
 
+        // console.log({value1: value})
         value = this.identifier(value) as Node; // Identifying the value
+        // console.log({value2: value})
 
+        this.debug({ name, value }, `assign call`);
         STORAGE.setVariable = { name, value };
         this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
         return value;

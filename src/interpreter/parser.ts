@@ -1,7 +1,7 @@
 import { Token, Node } from '../types/Parser';
 import { operators } from '../utility/operators';
 import { charset } from '../utility/charset';
-import { isDebug, debugFile } from '../index';
+import { isDebug, debugFile, STORAGE } from '../index';
 import { identifiers } from '../utility/identifiers';
 
 import String from './parser/string';
@@ -95,7 +95,8 @@ export class Parser {
      * @returns {boolean} If the token is a math then true.
      */
     private checkMath(token: Token): boolean {
-        return ([ 'add', 'subtract', 'multiply', 'divide', 'lessThan', 'greaterThan', 'dot'].includes(token.type))
+        if (STORAGE.memory.has(token.value) && STORAGE.memory.get(token.value)!.value.type == 'number') return true;
+        else return ([ 'add', 'subtract', 'multiply', 'divide', 'lessThan', 'greaterThan', 'dot'].includes(token.type))
     }
 
     /**
