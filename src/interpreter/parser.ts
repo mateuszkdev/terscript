@@ -73,20 +73,28 @@ export class Parser {
         this.lastToken = this.current || { type: 'undefined', value: '', line: 0, index: 0 };
         this.current = this.next();
   
-        /* Checking maths */
-        if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseMath();
-
         /* Check for the type of token */
-        if (this.current.type == 'quote') return this.parseString();
+        if (this.checkMath(this.current)) return this.parseMath();
+        else if (this.current.type == 'quote') return this.parseString();
         else if (this.current.value == 'true' || this.current.value == 'false') return { type: 'boolean', value: this.current.value, children: [] };
         else if (this.current.type == 'letters' && Object.keys(identifiers.condition).includes(this.current.value)) return { type: 'condition', value: this.current.value, children: [] };
         else if (this.current.type == 'letters') return { type: 'identifier', value: this.current.value, children: [] };
-        else if (this.current.type == 'numbers') return { type: 'number', value: this.current.value, children: [] };
+        else if (this.current.type == 'numbers' && !this.checkMath(this.checkNextToken)) return { type: 'number', value: this.current.value, children: [] };
         else if (this.current.type == 'assign') return this.parseAssign();
         else if (this.current.type == 'leftParenthesis') return this.parseArguments();
         else if (this.current.type == 'leftBrace') return this.parseBraces();
         else return this.parse();
 
+    }
+
+    /**
+     * @name checkMath
+     * @description The checkMath method is responsible for checking if the token is a math token.
+     * @param {Token} token The token to check
+     * @returns {boolean} If the token is a math then true.
+     */
+    private checkMath(token: Token): boolean {
+        return ([ 'add', 'subtract', 'multiply', 'divide', 'lessThan', 'greaterThan' ].includes(token.type))
     }
 
     /**
