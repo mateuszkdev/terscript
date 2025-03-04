@@ -237,10 +237,11 @@ export class Evaluator {
             value += child.value;
         });
 
-        const num = eval(value);
+        const output = eval(value);
         
-        this.addOutput = `Math expression "${value}" evaluated to: ${num}`;
-        return { type: 'number', value: `${num}`, children: [] };
+        this.addOutput = `Math expression "${value}" evaluated to: ${output}`;
+        if (typeof output === 'boolean') return { type: 'boolean', value: `${output}`, children: [] };
+        else return { type: 'number', value: `${output}`, children: [] };
 
     }
 
