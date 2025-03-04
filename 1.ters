@@ -1,13 +1,30 @@
-# Testing if's
+import "./testcodes/ifs" # import works fine with ifs but this code below is not working xd
 
-x = 10
-
-if (true) {
-    log("x = @x")
+display() {
+    log("Hello World!") # function declaration working fine
 }
 
-if (false) {
-    log("x = @x")
+x = 10
+log(x) 
+display() # function call working fine
+
+if (true) { # parser skipping arguments here but idk why xd ./testcodes/its.ters works  fine
+    
+    display()
+
+    z = 20
+    displayZ() {
+        log("z = @z")
+    }
+
+}
+
+if (false) { # this if have arguments in parser output
+
+    displayX()
+
 } else {
-    log("x != @x")
+
+    displayZ()
+
 }

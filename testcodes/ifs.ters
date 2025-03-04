@@ -1,0 +1,13 @@
+# Testing if's
+
+x = 10
+
+if (true) {
+    log("x = @x")
+}
+
+if (false) {
+    log("x != @x")
+} else {
+    log("x = @x")
+}

@@ -130,7 +130,8 @@ export class Evaluator {
     private ifCondition(node: Node): void {
 
         this.debug(node, 'ifCondition call')
-
+        // console.log(this.tree)
+        // console.log({ node, n: this.checkNextNode, c: this.current })
         if (this.checkNextNode.type !== 'arguments') throw new Error('if requires arguments');
         const args = (this.next() as Node).children!;
 
@@ -329,7 +330,7 @@ export class Evaluator {
 
             return this.callFunction(node.value, args); // Calling the function and returning output
 
-        } else throw new Error(`Function ${node.value} is not declared.`); // Throw an error if the function is not declared
+        } 
 
     }
 
