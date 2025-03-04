@@ -47,7 +47,7 @@ export class Evaluator {
     private next(): Node | boolean {
 
         if (this.index + 1 >= this.tree.length) return this.power = false; // Check if the program should stop
-        if (typeof this.tree[this.index + 1] == 'boolean') { this.power = false; return false; }; // Skip the node if it is undefined
+        if (typeof this.tree[this.index + 1] == 'boolean') { this.power = false; return false; }; // Check if the program should stop
         return this.current = this.tree[++this.index]; // Return the next node
 
     }
@@ -130,6 +130,38 @@ export class Evaluator {
     private ifCondition(node: Node): void {
 
         this.debug(node, 'ifCondition call')
+
+        if (this.checkNextNode.type !== 'arguments') throw new Error('if requires arguments');
+        const args = (this.next() as Node).children!;
+
+        if (args.length < 1) throw new Error('if requires arguments');
+        if (args.length > 1) throw new Error('if requires only one argument');
+
+        const condition = args[0];
+
+        if (this.tree[this.index + 1].type !== 'braces') throw new Error('if requires braces');
+        const braces = (this.next() as Node).children!;
+
+        if (eval(condition.value)) { // true condition
+
+            const ifOutput = new Evaluator(braces).output;
+            this.addOutput = `If condition "${condition.value}" is true. Executing braces:\n${ifOutput}`;
+
+        } else { // false condition
+
+            if (this.checkNextNode.value === 'else') { // else condition
+                
+                this.next() // skip else
+
+                if (this.tree[this.index + 1].type !== 'braces') throw new Error('else requires braces');
+                const elseBraces = (this.next() as Node).children!;
+
+                const elseOutput = new Evaluator(elseBraces).output;
+                this.addOutput = `If condition "${condition.value}" is false. Executing else braces:\n${elseOutput}`;
+
+            } 
+
+        } // end of if, notink was true
 
     }
 

@@ -75,9 +75,8 @@ export class Parser {
   
         /* Checking maths */
         if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseMath();
-        console.log({ type: this.current.type, value: this.current.value, typeof: typeof this.current.value })
+        
         /* Check for the type of token */
-
         if (this.current.type == 'quote') return this.parseString();
         else if (this.current.value == 'true' || this.current.value == 'false') return { type: 'boolean', value: this.current.value, children: [] };
         else if (this.current.type == 'letters' && Object.keys(identifiers.condition).includes(this.current.value)) return { type: 'condition', value: this.current.value, children: [] };
