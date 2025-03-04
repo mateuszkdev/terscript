@@ -19,7 +19,10 @@ To run tests, run the following command and edit file `1.test` in root folder
 
 ```bash
   tsc --build
-  npm run test
+```
+npm run test (fileName from testcodes folder)
+```bash
+  npm run test even-number
 ```
 
 ## Feedback
