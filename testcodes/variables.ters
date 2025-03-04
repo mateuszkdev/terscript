@@ -1,5 +1,19 @@
-a = 1
-b = 2
-c = "String"
-d = log("pomidor")
-log(d)
+z = log("X")
+x = compare(1 23)
+c = 20
+y = variables()
+g = 10 #
+h = variables()
+j = variables()
+
+log('----')
+
+log(z)
+log(x)
+log(c)
+log(y)
+log(g)
+log(h)
+log(j)
+
+log('----')

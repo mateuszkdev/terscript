@@ -68,7 +68,8 @@ export class Evaluator {
 
         switch (this.current.type) {
 
-            case 'assign': { return this.assign(this.current.children![0].value, this.current.children![1] as Node); } // Assigning a variable
+            case 'condition': return this.itsCondition(this.current); // Evaluating a statement
+            case 'assign': return this.assign(this.current.children![0].value, this.current.children![1] as Node); // Assigning a variable
             case 'identifier': return this.identifier(this.current); // Identifying rest of the nodes
             case 'math': return this.itsMath(this.current); // Evaluating math
             case 'number': return this.evaluate(); // Returning a number
@@ -93,6 +94,7 @@ export class Evaluator {
         if (node.type === 'identifier' && node.value === 'import') return this.itsImport(node);
 
         if (node.type === 'assign') return this.assign(node.children![0].value, node.children![1] as Node); // Assigning a variable
+        else if (node.type === 'statement') return this.itsCondition(node); // Evaluating a statement
         else if (STORAGE.memory.has(node.value)) return this.itsVariable(node); // Returning a variable
         else if (node.type === 'math') return this.itsMath(node) // Evaluating math
         else if (node.type === 'arguments') return node; // Returning arguments
@@ -102,6 +104,32 @@ export class Evaluator {
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (typeof node === 'boolean') return node; // Returning a boolean
         else this.itsVariable(node); // Returning a variable
+
+    }
+
+    /**
+     * @name itsCondition
+     * @description Evaluate a condition
+     * @param {Node} node The node to check 
+     * @returns {*}
+     */
+    private itsCondition(node: Node): void {
+        
+        this.debug(node, 'itsCondition call');
+
+        if (node.value === 'if') return this.ifCondition(node);
+        
+    }
+
+    /**
+     * @name ifCondition
+     * @description Evaluate an if condition
+     * @param {Node} node If condidion node
+     * @returns {*} 
+     */
+    private ifCondition(node: Node): void {
+
+        this.debug(node, 'ifCondition call')
 
     }
 
