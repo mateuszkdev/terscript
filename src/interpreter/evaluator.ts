@@ -89,7 +89,7 @@ export class Evaluator {
      */
     private identifier(node: Node): Node | void {
 
-        this.debug(node, `identifier call`)
+        this.debug(node, `identifier call`);
 
         if (node.type === 'identifier' && node.value === 'import') return this.itsImport(node);
 
@@ -129,7 +129,7 @@ export class Evaluator {
      */
     private ifCondition(node: Node): void {
 
-        this.debug(node, 'ifCondition call')
+        this.debug(node, 'ifCondition call');
 
         if (this.checkNextNode.type !== 'arguments') throw new Error('if requires arguments');
 
@@ -174,15 +174,16 @@ export class Evaluator {
      */
     private checkBoolean(condition: Node): Node {
 
-        if (condition.type === 'boolean') condition.value = eval(condition.value)
+        if (condition.type === 'boolean') condition.value = eval(condition.value);
         else if (condition.type === 'string' && condition.value.length >= 1) condition.value = eval('true'); 
         else if (condition.type === 'number') {
             if (parseFloat(condition.value) > 0) condition.value = eval('true');
             else condition.value = eval('false');
         }
+        else throw new Error("Invalid 'if' condition");
 
         return { type: 'boolean', value: condition.value, children: [] };
-        
+
     }
 
     /**
@@ -192,7 +193,7 @@ export class Evaluator {
      */
     private itsImport(node: Node): void {
 
-        this.debug(node, 'itsImport call')
+        this.debug(node, 'itsImport call');
 
         if (this.checkNextNode.type !== 'string') throw new Error('import requires string path');
 
@@ -213,7 +214,7 @@ export class Evaluator {
      */
     private itsString(node: Node): Node {
         
-        this.debug(node, `itsString call`)
+        this.debug(node, `itsString call`);
 
         if (this.checkStringConstants(node)) return this.replaceStringConstants(node);
         return node;
@@ -228,7 +229,7 @@ export class Evaluator {
      */
     private itsMath(node: Node): Node {
 
-        this.debug(node, `itsMath call`)
+        this.debug(node, `itsMath call`);
 
         let value = '';
 
@@ -288,14 +289,14 @@ export class Evaluator {
 
         if (this.checkNextNode.type == 'arguments' || node.children?.some((child: Node) => child.type == 'arguments')) {
             
-            if (!this.checkNextNode || !this.tree[this.index + 2]) { return false; }
+            if (!this.checkNextNode || !this.tree[this.index + 2]) { return false; };
 
-            if (this.checkNextNode.type == 'arguments' && this.tree[this.index + 2].type == 'braces') { return true; }
+            if (this.checkNextNode.type == 'arguments' && this.tree[this.index + 2].type == 'braces') { return true; };
 
-            if (node.children?.some((child: Node) => child.type == 'arguments') && this.checkNextNode.type == 'braces') { return true; }
+            if (node.children?.some((child: Node) => child.type == 'arguments') && this.checkNextNode.type == 'braces') { return true; };
         }
 
-        return false
+        return false;
 
     }
 
@@ -340,7 +341,7 @@ export class Evaluator {
      */
     private itsFunction(node: Node): any {
 
-        this.debug(node, `itsFunction call`)
+        this.debug(node, `itsFunction call`);
 
         if (this.checkFunctionDeclaration(node)) { // Check if the function is declared, if not declare it and skip function execution
 

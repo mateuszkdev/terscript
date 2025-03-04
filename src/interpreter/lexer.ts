@@ -78,8 +78,14 @@ export class Lexer {
         if (!this.code[this.index + 1]) return this.power = false; // End of Lexer
 
         if (tmp == undefined && comments.inlineComment.test(this.code[this.index + 1])) { // Inline Comment
-            while (this.code[this.index + 1] != '\n') this.index++;
+            while (this.code[this.index + 1] != '\n'){
+                if (!this.code[this.index + 1] || this.code[this.index + 1] == undefined) { this.power = false; break; }
+                else this.index++;
+            }
+
+            if (!this.code[this.index + 1]) return false;
             return this.next();
+            
         }
 
         if (tmp == undefined && (this.code[this.index + 1] && this.code[this.index + 2])) { 

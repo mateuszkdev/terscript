@@ -1,8 +1,10 @@
-x = false
+10 > 20
 
-log(x)
-if (x) {
-    log("Cool")
-} else {
-    log("Sad")
-}
+# x = false
+
+# log(x)
+# if (x) {
+#     log("Cool")
+# } else {
+#     log("Sad")
+# }
