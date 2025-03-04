@@ -11,7 +11,6 @@ j = variables()
 
 log('----')
 
-# log wypisuje undefined dla zmiennych zawierajacych output funkcji
 log(z)
 log(x)
 log(c)

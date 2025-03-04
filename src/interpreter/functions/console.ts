@@ -11,7 +11,7 @@ export default {
             usage: 'log("Hello, World!")',
             run: (args) => {
                 console.log(...args);
-                return args;
+                return { type: 'string', value: `${args}`, children: [] };
             }
         },
         {

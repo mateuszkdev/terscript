@@ -11,12 +11,12 @@ export default {
             description: 'Returns all variables',
             usage: 'variables()',
             run: () => {
-                const variables: any = []
+                const variables: any[] = []
                 STORAGE.memory.forEach((value, key) => {
                     variables.push({ name: key, value: value.value })
                 })
-                // console.log(variables) // @TODO: Return the variables / need to implement a return system
-                return variables
+                // @TODO: Return the variables as array // need to implement array system
+                return { type: 'string', value: `${JSON.stringify(variables.map(v => v.name))}`, children: [] };
             }
         }
     ]
