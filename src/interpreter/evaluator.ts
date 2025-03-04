@@ -6,6 +6,8 @@ import load from '../modules/loader';
 import { Lexer } from './lexer';
 import { Parser } from './parser';
 
+const test = (x: any) => true && console.log(x);
+
 /**
  * @name Evaluator
  * @description Evaluate the tree
@@ -85,7 +87,7 @@ export class Evaluator {
      * @returns {void}
      */
     private identifier(node: Node): Node | void {
-        
+        test({ c: this.current, n: node })
         this.debug(node, `identifier call`)
 
         if (node.type === 'identifier' && node.value === 'import') return this.itsImport(node);
@@ -142,7 +144,7 @@ export class Evaluator {
      * @name isMath
      * @description Evaluate math
      * @param {Node} node The math node 
-     * @returb {Node}
+     * @return {Node}
      */
     private itsMath(node: Node): Node {
 
@@ -227,7 +229,7 @@ export class Evaluator {
      * @throws {Error} If the function does not have braces
      */
     private checkFunctionDeclaration(node: Node): boolean {
-        let x = 0
+
         this.debug(node, `checkFunctionDeclaration call`);
 
         if (FUNCTIONS.isFunction(node.value)) return true; // Check if the function is declared
@@ -259,19 +261,23 @@ export class Evaluator {
      * @returns {void}
      */
     private itsFunction(node: Node): any {
-
+        test('-------------------------')
         this.debug(node, `itsFunction call`)
 
         if (this.checkFunctionDeclaration(node)) { // Check if the function is declared, if not declare it and skip function execution
             let args = [] as Node[];
 
             if ((node.children && node.children.length >= 1) || this.checkNextNode.type == 'arguments') { // Check if the function has arguments
+
                 if (node.children![1] && node.children![1].type == 'arguments') {
                     args = node.children![1].children!; // Getting the arguments from node children
                 }
                 else if (this.checkNextNode.type == 'arguments') {
+                    test({ n: this.current, nn: this.checkNextNode })
                     args = (this.next() as Node).children!; // Getting the arguments from next node
-                    args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined); // Parse the arguments
+
+                    // args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined); // Parse the arguments
+                    test({ n: this.current, nn: this.checkNextNode })
                 }
                 else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
             }
@@ -287,14 +293,13 @@ export class Evaluator {
                         i++;
                     }
                 }
-
+                test('-------------------------')
                 return newArgs.forEach((arg: Node) => this.identifier(arg)); // Identifying the arguments
             }
-
+            test({ args: JSON.stringify(args) })
             args = this.parseArguments(args as Node[]); // Parsing the arguments
-
-            // console.log(`{args: ${JSON.stringify(args)}}`)
-
+            test({ args2: JSON.stringify(args) })
+            test('-------------------------')
             return this.callFunction(node.value, args); // Calling the function and returning output
 
         }
@@ -314,7 +319,7 @@ export class Evaluator {
         const isProcessFunction = typeof fun.run !== 'function'; // Check if the function is a process function
 
         const output = !isProcessFunction ? (fun as any).run(args.map((arg: Node) => arg.value)) : this.callEvaluator(fun.run as Node[]);
-        // console.log({ output, isProcessFunction, fun, args })
+
         this.addOutput = `Function "${functionName}" called with arguments: ${JSON.stringify(args)}`;
         this.addOutput = `${functionName} output: ${JSON.stringify(output)}\n`;
         return output;
@@ -349,7 +354,6 @@ export class Evaluator {
      */
     private itsVariable(node: Node): Node {
 
-        // console.log(node)
         let variable = STORAGE.getVariable(node.value);
         this.addOutput = `Variable "${node.value}" called. Value: ${variable}\n`;
         return variable;
@@ -415,7 +419,7 @@ export class Evaluator {
 
         this.debug(currentNode, `skipNode call`)
         if (currentNode && currentNode.type == 'identifier') {
-            // console.log(2)
+
             if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) this.current = this.next() as Node;
         }
 
