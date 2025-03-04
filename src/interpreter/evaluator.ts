@@ -87,7 +87,7 @@ export class Evaluator {
      * @returns {void}
      */
     private identifier(node: Node): Node | void {
-        test({ c: this.current, n: node })
+
         this.debug(node, `identifier call`)
 
         if (node.type === 'identifier' && node.value === 'import') return this.itsImport(node);
@@ -241,8 +241,6 @@ export class Evaluator {
             if (this.checkNextNode.type == 'arguments') functionData.args = (this.next() as Node).children!; // Getting the arguments from next node
             else functionData.args = node.children!.filter((child: Node) => child.type == 'arguments') as Node[]; // Getting the arguments from node children
 
-            // this.next(); // Skip the arguments
-
             if (!this.checkNextNode || this.checkNextNode.type != 'braces') throw new Error(`Function ${node.value} requires braces.`); // Throw an error if the function does not have braces
             functionData.run = (this.next() as Node).children!; // Getting the function run Nodes
 
@@ -261,48 +259,17 @@ export class Evaluator {
      * @returns {void}
      */
     private itsFunction(node: Node): any {
-        test('-------------------------')
+
         this.debug(node, `itsFunction call`)
 
         if (this.checkFunctionDeclaration(node)) { // Check if the function is declared, if not declare it and skip function execution
-            let args = [] as Node[];
 
-            if ((node.children && node.children.length >= 1) || this.checkNextNode.type == 'arguments') { // Check if the function has arguments
-
-                if (node.children![1] && node.children![1].type == 'arguments') {
-                    args = node.children![1].children!; // Getting the arguments from node children
-                }
-                else if (this.checkNextNode.type == 'arguments') {
-                    test({ n: this.current, nn: this.checkNextNode })
-                    args = (this.next() as Node).children!; // Getting the arguments from next node
-
-                    // args = args.map((arg: Node) => this.identifier(arg)).filter((arg): arg is Node => arg !== undefined); // Parse the arguments
-                    test({ n: this.current, nn: this.checkNextNode })
-                }
-                else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
-            }
-            else if (args.some((arg: Node) => arg.type == 'identifier' || arg.type == 'arguments')) { // Check if the arguments are functions with arguments
-
-                let newArgs = [];
-                for (let i = 0; i <= args.length; i++) {
-
-                    if (args[i] && args[i].type == 'identifier' && args[i + 1] && args[i + 1].type == 'arguments') {
-                        let arg = args[i]
-                        arg.children?.push(args[++i]); // Adding the arguments to the function children
-                        newArgs.push(arg)
-                        i++;
-                    }
-                }
-                test('-------------------------')
-                return newArgs.forEach((arg: Node) => this.identifier(arg)); // Identifying the arguments
-            }
-            test({ args: JSON.stringify(args) })
+            let args = this.getFunctionArguments(node); // Getting the function arguments
             args = this.parseArguments(args as Node[]); // Parsing the arguments
-            test({ args2: JSON.stringify(args) })
-            test('-------------------------')
+
             return this.callFunction(node.value, args); // Calling the function and returning output
 
-        }
+        } else throw new Error(`Function ${node.value} is not declared.`); // Throw an error if the function is not declared
 
     }
 
@@ -361,31 +328,71 @@ export class Evaluator {
     }
 
     /**
+     * @name getFunctionArguments
+     * @description Get the function arguments
+     * @param {Node} node The node to get arguments 
+     * @returns {Node[]} The function arguments
+     */
+    private getFunctionArguments(node: Node): Node[] | void {
+
+        let args: Node[] = [];
+
+        if ((node.children && node.children.length >= 1) || this.checkNextNode.type == 'arguments') { // Check if the function has arguments
+
+            if (node.children![1] && node.children![1].type == 'arguments') {
+                args = node.children![1].children!; // Getting the arguments from node children
+            }
+            else if (this.checkNextNode.type == 'arguments') {
+
+                args = (this.next() as Node).children!; // Getting the arguments from next node
+                return args;
+
+            }
+            else throw new Error(`Function ${node.value} requires arguments.`); // Throw an error if the function does not have arguments
+        }
+        else if (args.some((arg: Node) => arg.type == 'identifier' || arg.type == 'arguments')) { // Check if the arguments are functions with arguments
+
+            let newArgs = [];
+            for (let i = 0; i <= args.length; i++) {
+
+                if (args[i] && args[i].type == 'identifier' && args[i + 1] && args[i + 1].type == 'arguments') {
+                    let arg = args[i]
+                    arg.children?.push(args[++i]); // Adding the arguments to the function children
+                    newArgs.push(arg)
+                    i++;
+                }
+            }
+
+            return newArgs.forEach((arg: Node) => this.identifier(arg)); // Identifying the arguments
+        }
+
+    }
+
+    /**
      * @name assign
      * @description Assign a variable
      * @returns {void}
      */
     private assign(name: string, value: Node): Node { // @TODO Fix this method, sometimes skipping nodes and not assigning variables
+        // test({ newAssign: { name, value } })
 
-        // console.log(name, value)
-        // console.log({ c: this.current, n: this.checkNextNode, nn: this.tree[this.index + 2], nnn: this.tree[this.index+3] })
-        // console.log(this.checkNextNode)
         if (FUNCTIONS.isFunction(value.value)) { // Check if the value is a function
 
             const nextNode = this.next() as Node;
             if (nextNode.type == 'arguments') { // Check if the function has arguments
 
-                // console.log({ value, ch: value.children, x: "XD" })
+                // test({ value, ch: value.children, x: "just before assign" })
                 value = this.callFunction(value.value, nextNode.children!) // Call the function
-                // console.log({ o })
-                this.next(); // Skip the arguments
+
+                // this.next(); // Skip the arguments
 
             } else throw new Error(`Function ${value.value} requires arguments.`); // Throw an error if the function does not have arguments
 
         }
 
-        this.next();
-        // console.log({ c: this.current, n: this.checkNextNode, nn: this.tree[this.index + 2], nnn: this.tree[this.index+3] })
+        // this.next();
+        // test({ c: JSON.stringify(this.current) })
+        // test({ c: this.current, n: this.checkNextNode, nn: this.tree[this.index + 2], nnn: this.tree[this.index+3], nextChildren0: this.current.children![0], nextChildren1: this.current.children![1] })
         STORAGE.setVariable = { name, value };
         this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
         return value;
