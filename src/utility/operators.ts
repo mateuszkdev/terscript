@@ -18,7 +18,8 @@ export const operators = {
     rightBrace: [/\}/],
     variableInString: [/@/],
     lessThan: [/\</],
-    greaterThan: [/\>/]
+    greaterThan: [/\>/],
+    dot: [/\./]
 }
 
 export const comments = {

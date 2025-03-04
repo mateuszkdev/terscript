@@ -75,6 +75,7 @@ export class Parser {
   
         /* Check for the type of token */
         if (this.checkMath(this.current)) return this.parseMath();
+        else if(this.current.type == 'dot' && (this.lastToken.type == 'numbers' || this.checkNextToken.type == 'letters')) return this.parseMath();
         else if (this.current.type == 'quote') return this.parseString();
         else if (this.current.value == 'true' || this.current.value == 'false') return { type: 'boolean', value: this.current.value, children: [] };
         else if (this.current.type == 'letters' && Object.keys(identifiers.condition).includes(this.current.value)) return { type: 'condition', value: this.current.value, children: [] };
@@ -94,7 +95,7 @@ export class Parser {
      * @returns {boolean} If the token is a math then true.
      */
     private checkMath(token: Token): boolean {
-        return ([ 'add', 'subtract', 'multiply', 'divide', 'lessThan', 'greaterThan' ].includes(token.type))
+        return ([ 'add', 'subtract', 'multiply', 'divide', 'lessThan', 'greaterThan', 'dot'].includes(token.type))
     }
 
     /**
@@ -108,11 +109,9 @@ export class Parser {
 
         const maths: Node[] = [];
         maths.push(this.lastToken, this.current, this.next());
-
-        // if (this.lastToken === this.tokens[this.index - 1]) this.tokens.shift(); // remove the last token from the tokens array
-
+        
         while (true) {
-            
+
             if (this.checkMath(this.checkNextToken) || (this.tokens[this.index + 2].value == '=')) {
 
                 if (this.tokens[this.index + 2].value == '=') maths.push(this.next());
