@@ -1,0 +1,31 @@
+import "./testcodes/functions"
+
+displayZ() {
+    log("Hello World! @z")
+}
+
+x = "Sad"
+
+if (true) {
+    
+    z = "Whats up?"
+
+    displayZ()
+
+    display() {
+        log("Well Hello! Fine")
+    }
+
+}
+
+if (false) {
+
+    log(x)
+
+} else {
+
+    display()
+    log("and")
+    vehicles()
+
+}

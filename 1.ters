@@ -1,31 +1,8 @@
-import "./testcodes/functions"
+x = false
 
-displayZ() {
-    log("Hello World! @z")
-}
-
-x = "Sad"
-
-if (true) {
-    
-    z = "Whats up?"
-
-    displayZ()
-
-    display() {
-        log("Well Hello! Fine")
-    }
-
-}
-
-if (false) {
-
-    log(x)
-
+log(x)
+if (x) {
+    log("Cool")
 } else {
-
-    display()
-    log("and")
-    vehicles()
-
+    log("Sad")
 }

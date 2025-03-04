@@ -130,20 +130,20 @@ export class Evaluator {
     private ifCondition(node: Node): void {
 
         this.debug(node, 'ifCondition call')
-        // console.log(this.tree)
-        // console.log({ node, n: this.checkNextNode, c: this.current })
-        if (this.checkNextNode.type !== 'arguments') throw new Error('if requires arguments');
-        const args = (this.next() as Node).children!;
 
+        if (this.checkNextNode.type !== 'arguments') throw new Error('if requires arguments');
+
+        const args = this.parseArguments((this.next() as Node).children!);
+ 
         if (args.length < 1) throw new Error('if requires arguments');
         if (args.length > 1) throw new Error('if requires only one argument');
 
-        const condition = args[0];
+        const condition = this.checkBoolean(args[0]);
 
         if (this.tree[this.index + 1].type !== 'braces') throw new Error('if requires braces');
         const braces = (this.next() as Node).children!;
-
-        if (eval(condition.value)) { // true condition
+ 
+        if (condition.value) { // true condition
 
             const ifOutput = new Evaluator(braces).output;
             this.addOutput = `If condition "${condition.value}" is true. Executing braces:\n${ifOutput}`;
@@ -164,6 +164,25 @@ export class Evaluator {
 
         } // end of if, notink was true
 
+    }
+
+    /**
+     * @name checkBolean
+     * @description Check the node value boolean
+     * @param {Node} condition Node to check boolean of it
+     * @returns {Node} The node with boolean value
+     */
+    private checkBoolean(condition: Node): Node {
+
+        if (condition.type === 'boolean') condition.value = eval(condition.value)
+        else if (condition.type === 'string' && condition.value.length >= 1) condition.value = eval('true'); 
+        else if (condition.type === 'number') {
+            if (parseFloat(condition.value) > 0) condition.value = eval('true');
+            else condition.value = eval('false');
+        }
+
+        return { type: 'boolean', value: condition.value, children: [] };
+        
     }
 
     /**
