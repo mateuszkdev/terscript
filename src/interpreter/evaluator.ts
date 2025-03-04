@@ -471,9 +471,8 @@ export class Evaluator {
 
         }
 
-        // this.next();
-        // test({ c: JSON.stringify(this.current) })
-        // test({ c: this.current, n: this.checkNextNode, nn: this.tree[this.index + 2], nnn: this.tree[this.index+3], nextChildren0: this.current.children![0], nextChildren1: this.current.children![1] })
+        value = this.identifier(value) as Node; // Identifying the value
+
         STORAGE.setVariable = { name, value };
         this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
         return value;
