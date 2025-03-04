@@ -96,7 +96,7 @@ export class Parser {
      */
     private checkMath(token: Token): boolean {
         if (STORAGE.memory.has(token.value) && STORAGE.memory.get(token.value)!.value.type == 'number') return true;
-        else return ([ 'add', 'subtract', 'multiply', 'divide', 'lessThan', 'greaterThan', 'dot'].includes(token.type))
+        else return ([ 'add', 'subtract', 'multiply', 'divide', 'lessThan', 'greaterThan', 'dot', 'modulus'].includes(token.type))
     }
 
     /**

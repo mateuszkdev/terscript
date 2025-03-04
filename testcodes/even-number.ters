@@ -1,0 +1,9 @@
+for(11) {
+
+    if (i % 2 == 0) {
+        log("@i is an even number")
+    } else {
+        log("@i is an odd number")
+    }
+
+}

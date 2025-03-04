@@ -1,7 +1,7 @@
 import "./testcodes/functions"
 
 displayZ() {
-    log("Hello World! @z")
+    log("Hello World ! @z")
 }
 
 condition = true
@@ -10,11 +10,11 @@ x = 0
 tomato() {
 
     log("")
-    log("Number is: @x")
+    log("Number is : @x")
 
     if (condition) {
     
-        z = "Whats up?"
+        z = "Whats up ?"
     
         displayZ()
     

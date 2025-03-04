@@ -19,7 +19,8 @@ export const operators = {
     variableInString: [/@/],
     lessThan: [/\</],
     greaterThan: [/\>/],
-    dot: [/\./]
+    dot: [/\./],
+    modulus: [/\%/]
 }
 
 export const comments = {

@@ -1,10 +1,12 @@
+power = 100
+
 myFunction() {
-    log("Hello World!")
+    log("Hello World !")
 }
 
 car() {
-    log("Car is red, and it power up to:")
-    log(100 + 100, "HP!")
+    log("Car is red and it power up to:")
+    log(power, "HP !")
 }
 
 vehicles() {
