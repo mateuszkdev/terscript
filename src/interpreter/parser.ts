@@ -75,7 +75,7 @@ export class Parser {
   
         /* Checking maths */
         if (this.current.type == 'add' || this.current.type == 'subtract' || this.current.type == 'multiply' || this.current.type == 'divide') return this.parseMath();
-        
+
         /* Check for the type of token */
         if (this.current.type == 'quote') return this.parseString();
         else if (this.current.value == 'true' || this.current.value == 'false') return { type: 'boolean', value: this.current.value, children: [] };
@@ -221,7 +221,7 @@ export class Parser {
 
         this.debug(this.current, 'parseAssign call') // debug log;
 
-        this.tree.pop();
+        // this.tree.pop();
         return { type: 'assign', value: '=', children: [this.lastToken, this.parse() as Token] };
 
     }

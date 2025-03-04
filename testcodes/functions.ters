@@ -7,10 +7,11 @@ car() {
     log(100 + 100, "HP!")
 }
 
-vahicles() {
+vehicles() {
     log("Car:")
     car()
 }
 
-myFunction()
-vahicles()
+# myFunction()
+# vehicles()
+log("")

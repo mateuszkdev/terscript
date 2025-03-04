@@ -1,30 +1,31 @@
-import "./testcodes/ifs" # import works fine with ifs but this code below is not working xd
+import "./testcodes/functions"
 
-display() {
-    log("Hello World!") # function declaration working fine
+displayZ() {
+    log("Hello World! @z")
 }
 
-x = 10
-log(x) 
-display() # function call working fine
+x = "Sad"
 
-if (true) { # parser skipping arguments here but idk why xd ./testcodes/its.ters works  fine
+if (true) {
     
-    display()
+    z = "Whats up?"
 
-    z = 20
-    displayZ() {
-        log("z = @z")
+    displayZ()
+
+    display() {
+        log("Well Hello! Fine")
     }
 
 }
 
-if (false) { # this if have arguments in parser output
+if (false) {
 
-    displayX()
+    log(x)
 
 } else {
 
-    displayZ()
+    display()
+    log("and")
+    vehicles()
 
 }
