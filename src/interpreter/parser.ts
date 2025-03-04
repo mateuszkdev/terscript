@@ -112,10 +112,11 @@ export class Parser {
         // if (this.lastToken === this.tokens[this.index - 1]) this.tokens.shift(); // remove the last token from the tokens array
 
         while (true) {
-  
-            if (this.checkMath(this.checkNextToken)) {
+            
+            if (this.checkMath(this.checkNextToken) || (this.tokens[this.index + 2].value == '=')) {
 
-                maths.push(this.next(), this.next())
+                if (this.tokens[this.index + 2].value == '=') maths.push(this.next());
+                maths.push(this.next(), this.next());
 
             } else break;
 
