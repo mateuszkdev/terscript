@@ -70,7 +70,8 @@ export class Parser {
         this.current = this.next();
   
         /* Check for the type of token */
-        if (this.checkMath(this.current)) return this.parseMath();
+        if (this.current.type == 'dot' && (this.lastToken.type == 'letters' && this.checkNextToken.type == 'letters')) return { type: 'objectCall', value: '.', children: [this.lastToken, this.next()] };
+        else if (this.checkMath(this.current)) return this.parseMath();
         else if(this.current.type == 'dot' && (this.lastToken.type == 'numbers' || this.checkNextToken.type == 'letters')) return this.parseMath();
         else if (this.current.type == 'quote') return this.parseString();
         else if (this.current.value == 'true' || this.current.value == 'false') return { type: 'boolean', value: this.current.value, children: [] };

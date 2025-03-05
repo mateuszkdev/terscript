@@ -74,6 +74,7 @@ export class Evaluator {
             case 'math': return this.itsMath(this.current); // Evaluating math
             case 'number': return this.evaluate(); // Returning a number
             case 'string': return this.itsString(this.current); // Returning a string
+            case 'objectCall': return this.objectCall(this.current) // Calling an object
 
         }
 
@@ -104,7 +105,19 @@ export class Evaluator {
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (node.type === 'boolean') return node; // Returning a boolean
         else if (node.type === 'object') return this.itsObject(node); // Returning an object
+        else if (node.type === 'objectCall') return this.objectCall(node); // Calling an object
         else this.itsVariable(node); // Returning a variable
+
+    }
+
+    private objectCall(node: Node): Node {
+
+        if (!STORAGE.memory.has(node.children![0].value)) throw new Error(`Object ${node.children![0].value} does not exist`);
+        const object = STORAGE.getVariable(node.children![0].value).value;
+
+        console.log({ object: (JSON.parse(object)).value })
+
+        return { type: 'object', value: object, children: [] };
 
     }
 
