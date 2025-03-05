@@ -103,8 +103,13 @@ export class Evaluator {
         else if (this.checkFunctionDeclarationNodes(node)) return this.itsFunction(node); // Checking if the node is a function declaration
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (node.type === 'boolean') return node; // Returning a boolean
+        else if (node.type === 'object') return this.itsObject(node); // Returning an object
         else this.itsVariable(node); // Returning a variable
 
+    }
+
+    private itsObject(node: Node) {
+        return node;
     }
 
     /**
@@ -498,18 +503,13 @@ export class Evaluator {
             const nextNode = this.next() as Node;
             if (nextNode.type == 'arguments') { // Check if the function has arguments
 
-                // test({ value, ch: value.children, x: "just before assign" })
                 value = this.callFunction(value.value, nextNode.children!) // Call the function
-
-                // this.next(); // Skip the arguments
 
             } else throw new Error(`Function ${value.value} requires arguments.`); // Throw an error if the function does not have arguments
 
         }
 
-        // console.log({value1: value})
         value = this.identifier(value) as Node; // Identifying the value
-        // console.log({value2: value})
 
         this.debug({ name, value }, `assign call`);
         STORAGE.setVariable = { name, value };

@@ -16,7 +16,8 @@ export default {
                     variables.push({ name: key, value: value.value })
                 })
                 // @TODO: Return the variables as array // need to implement array system
-                return { type: 'string', value: `${JSON.stringify(variables.map(v => v.name))}`, children: [] };
+                // return { type: 'string', value: `${JSON.stringify(variables.map(v => v.name))}`, children: [] };
+                return { type: 'string', value: JSON.stringify(variables), children: [] };
             }
         }
     ]

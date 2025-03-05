@@ -1,9 +1,15 @@
+log("pomidor")
+
 car = {
-    brand: "DODGE",
-    model: "CHALLENGER",
-    year: 2015,
-    isUsed: true,
-    displayInfo: () {
-        log("@brand @model @year @isUsed")
-    }
+    brand: "DODGE"
+    model: "CHALLENGER"
+    year: 2015
+    isUsed: true
+    # displayInfo: () {
+    #     log("@brand @model @year @isUsed") # support for function in future
+    # }
 }
+
+
+x = variables()
+log(x)

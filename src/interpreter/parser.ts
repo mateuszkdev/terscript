@@ -48,10 +48,6 @@ export class Parser {
 
             if (typeof this.node === 'undefined' || typeof this.node === 'boolean') break;
 
-            // console.log("-----------------------------")
-            // console.log({ node: JSON.stringify(this.node) }) // test log
-            // console.log("-----------------------------")
-
             this.tree.push(this.node);
         }
 
@@ -98,10 +94,26 @@ export class Parser {
 
         this.debug(this.current, 'itsObject call');
 
-        const objectNodes: Node[] = this.parseBraces().children![0].children as Node[];
-        console.log({ objectNodes })
+        this.next();
 
-        return { type: 'object', value: '', children: [] };
+        const objectNodes: Node[] = this.parseBraces().children as Node[];
+        const object: any = {} // @TODO implement a type for this
+
+        for (let i = 0; i < objectNodes.length; i++) {
+
+            if (objectNodes[i].type != 'identifier') throw new Error('Object keys must be identifiers');
+            if (objectNodes[i + 1].type != 'colon') throw new Error('Object keys must be followed by a colon');
+
+            const key = objectNodes[i].value;
+            i++;
+            const value = objectNodes[++i];
+
+            object[key] = value;
+
+        }
+
+
+        return { type: 'object', value: '', children: [object] };
 
     }
 
@@ -194,17 +206,14 @@ export class Parser {
 
         this.debug('Parsing Braces')
         while (true) {
-            // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-            // console.log(this.current, this.checkNextToken)
-            // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+
             if (typeof this.checkNextToken == 'undefined' || typeof this.checkNextToken == 'boolean' || !this.checkNextToken) { this.next(); break; }
-            // if (this.checkNextToken.type == 'leftBrace') {
-            //     // console.log({ t: this.tree, tm1: this.tree[this.index - 1], nt: this.checkNextToken })
-            //     if (this.tree[this.index - 1].type != 'arguments') throw new Error('Braces are not allowed in braces');
-            // }
+
             if (this.checkNextToken.type == 'rightBrace') { this.next(); break; }
+
             this.debug(this.current)
             braces.push(this.parse() as Node);
+
         }
 
         this.debug({ type: 'braces', value: '', children: braces }, 'braces output')
@@ -246,7 +255,7 @@ export class Parser {
     private parseAssign(): Node {
 
         this.debug(this.current, 'parseAssign call') // debug log;
-        console.log({ c: this.current, n: this.checkNextToken })
+
         if (this.checkNextToken.type == 'leftBrace') return {
             type: 'assign', value: '=', children: [this.lastToken, this.itsObject()]
         }
