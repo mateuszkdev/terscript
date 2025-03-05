@@ -110,18 +110,34 @@ export class Evaluator {
 
     }
 
+    /**
+     * @name objectCall
+     * @description Call an object by key and get value
+     * @param {Node} node The node to call 
+     * @returns {Node} The object value
+     */
     private objectCall(node: Node): Node {
 
         if (!STORAGE.memory.has(node.children![0].value)) throw new Error(`Object ${node.children![0].value} does not exist`);
-        const object = STORAGE.getVariable(node.children![0].value).value;
+        const object = JSON.parse(JSON.stringify(STORAGE.getVariable(node.children![0].value).children))[0];
 
-        console.log({ object: (JSON.parse(object)).value })
+        const key = node.children![1].value;
 
-        return { type: 'object', value: object, children: [] };
+        if (!object[key]) throw new Error(`Object ${node.children![0].value} does not have key ${key}`);
+
+        const value = object[key];
+
+        return { type: value.type, value: value.value, children: value.children };
 
     }
 
-    private itsObject(node: Node) {
+    /**
+     * @name itsObject
+     * @description Return an object
+     * @param {Node} node The node to return 
+     * @returns {Node} The object
+     */
+    private itsObject(node: Node): Node {
         return node;
     }
 
@@ -185,10 +201,13 @@ export class Evaluator {
 
         if (this.checkNextNode.type !== 'arguments') throw new Error('if requires arguments');
 
-        const args = this.parseArguments((this.next() as Node).children!);
- 
-        if (args.length < 1) throw new Error('if requires arguments');
-        if (args.length > 1) throw new Error('if requires only one argument');
+        let args = (this.next() as Node).children!;
+        
+        
+
+        // if (args.length > 1 && args.find((arg: Node) => arg.type == 'objectCall')) 
+        // if (args.length < 1) throw new Error('if requires arguments');
+        // if (args.length > 1) throw new Error('if requires only one argument');
 
         const condition = this.checkBoolean(args[0]);
 

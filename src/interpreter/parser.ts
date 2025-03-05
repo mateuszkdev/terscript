@@ -113,7 +113,6 @@ export class Parser {
 
         }
 
-
         return { type: 'object', value: '', children: [object] };
 
     }
