@@ -1,4 +1,4 @@
-# typescript-interpreter
+# terscript interpreter
 Simple interpreter in TypeScript
 
 More information about usage etc. soon.
