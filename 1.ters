@@ -1,13 +1,9 @@
 
-car = {
-    brand: "DODGE"
-    model: "CHALLENGER"
-    year: 2015
-    isUsed: true
-}
-
-if (car.isUsed) {
-    log(car.year)
-} else {
-    log(car.brand)
-}
+/*
+To do:
+    Quick if statement:  condition ? true : false
+    Math with variables:  variable == 1
+    Arrays: [1, 2, 3, 4]
+    Loops for arrays: for(array) - as default pre-definied variable "e" or optional for(smth in array)
+    Functions in objects: object.function() // { myFunc: function() {} }
+*/

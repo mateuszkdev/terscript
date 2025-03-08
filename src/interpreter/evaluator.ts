@@ -203,11 +203,10 @@ export class Evaluator {
 
         let args = (this.next() as Node).children!;
         
-        
+        if (!args.find((arg: Node) => arg.type == 'objectCall') && args.length !== 1) throw new Error('if requires one argument');
+        if (args.find((arg: Node) => arg.type == 'objectCall') && args.length !== 2) throw new Error('if requires one argument');
 
-        // if (args.length > 1 && args.find((arg: Node) => arg.type == 'objectCall')) 
-        // if (args.length < 1) throw new Error('if requires arguments');
-        // if (args.length > 1) throw new Error('if requires only one argument');
+        if (args.find((arg: Node) => arg.type == 'objectCall')) args = [this.objectCall(args[1])];
 
         const condition = this.checkBoolean(args[0]);
 
@@ -327,6 +326,12 @@ export class Evaluator {
         return !!new RegExp('@').test(node.value);
     }
 
+    /**
+     * @name replaceStringConstants
+     * @description Replace the string constants
+     * @param {Node} node String nod to replace constants 
+     * @returns {Node} The node with replaced constants
+     */
     private replaceStringConstants(node: Node): Node {
 
         let str = node.value;
@@ -341,8 +346,6 @@ export class Evaluator {
 
             }
         });
-
-        // console.log(str)
 
         return { type: 'string', value: str, children: [] };
 
