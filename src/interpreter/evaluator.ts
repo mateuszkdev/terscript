@@ -1,10 +1,14 @@
 import { Node } from '../types/Parser';
 import { STORAGE, FUNCTIONS, isDebug, debugFile } from '../index';
 import { FunctionDeclaration } from 'types/Functions';
+import { StringStructure } from './evaluator/string';
 
 import load from '../modules/loader';
 import { Lexer } from './lexer';
 import { Parser } from './parser';
+import { VariableStructure } from './evaluator/variables';
+import { BooleanStructure } from './evaluator/boolean';
+import { FunctionStructure } from './evaluator/function';
 
 const test = (x: any) => false && console.log(x);
 
@@ -242,19 +246,7 @@ export class Evaluator {
      * @param {Node} condition Node to check boolean of it
      * @returns {Node} The node with boolean value
      */
-    private checkBoolean(condition: Node): Node {
-
-        if (condition.type === 'boolean') condition.value = eval(condition.value);
-        else if (condition.type === 'string' && condition.value.length >= 1) condition.value = eval('true'); 
-        else if (condition.type === 'number') {
-            if (parseFloat(condition.value) > 0) condition.value = eval('true');
-            else condition.value = eval('false');
-        }
-        else throw new Error("Invalid 'if' condition");
-
-        return { type: 'boolean', value: condition.value, children: [] };
-
-    }
+    private checkBoolean(condition: Node): Node { return BooleanStructure.evalBoolean(condition); }
 
     /**
      * @name itsImport
@@ -286,7 +278,7 @@ export class Evaluator {
         
         this.debug(node, `itsString call`);
 
-        if (this.checkStringConstants(node)) return this.replaceStringConstants(node);
+        if (this.checkStringConstants(node)) return StringStructure.replaceVariables(node.value);
         return node;
 
     }
@@ -304,7 +296,7 @@ export class Evaluator {
         let value = '';
 
         node.children?.forEach((child: Node) => {
-            if (STORAGE.memory.has(child.value)) value += STORAGE.getVariable(child.value).value;
+            if (VariableStructure.hasVariable(child.value)) value += VariableStructure.getVariable(child.value).value;
             else value += child.value;
         });
 
@@ -322,34 +314,7 @@ export class Evaluator {
      * @param {Node} node The node to check
      * @returns {boolean} If the string has constants
      */
-    private checkStringConstants(node: Node): boolean {
-        return !!new RegExp('@').test(node.value);
-    }
-
-    /**
-     * @name replaceStringConstants
-     * @description Replace the string constants
-     * @param {Node} node String nod to replace constants 
-     * @returns {Node} The node with replaced constants
-     */
-    private replaceStringConstants(node: Node): Node {
-
-        let str = node.value;
-
-        const elements = /\s/g.test(str) ? str.split(/\s+/) : [str];
-        elements.forEach((element: string) => {
-            if (new RegExp('@').test(element)) {
-
-                const variableName = element.replace('@', '');
-                const variable = STORAGE.getVariable(variableName);
-                str = str.replace(`@${variableName}`, variable.value);
-
-            }
-        });
-
-        return { type: 'string', value: str, children: [] };
-
-    }
+    private checkStringConstants(node: Node): boolean { return StringStructure.checkStringVariables(node.value); }
 
     /**
      * @name checkFunctionDeclarationNodes
@@ -421,8 +386,7 @@ export class Evaluator {
 
         if (this.checkFunctionDeclaration(node)) { // Check if the function is declared, if not declare it and skip function execution
 
-            let args = this.getFunctionArguments(node); // Getting the function arguments
-            args = this.parseArguments(args as Node[]); // Parsing the arguments
+            const args = this.parseArguments(this.getFunctionArguments(node) as Node[]); // Parsing the arguments
 
             return this.callFunction(node.value, args); // Calling the function and returning output
 
@@ -439,21 +403,12 @@ export class Evaluator {
      */
     private callFunction(functionName: string, args: Node[]): any {
 
-        const fun = FUNCTIONS.getFunction(functionName); // Getting the function
-        const isProcessFunction = typeof fun.run !== 'function'; // Check if the function is a process function
-
-        const output = !isProcessFunction ? (fun as any).run(args.map((arg: Node) => arg.value)) : this.callEvaluator(fun.run as Node[]);
+        const output = FunctionStructure.callFunction(functionName, args); // Call the function
 
         this.addOutput = `Function "${functionName}" called with arguments: ${JSON.stringify(args)}`;
         this.addOutput = `${functionName} output: ${JSON.stringify(output)}\n`;
         return output;
 
-    }
-
-    private callEvaluator(tree: Node[]): string {
-        const output = new Evaluator(tree).output;
-        this.addOutput = `Calling new evaluator with tree: ${JSON.stringify(tree)}\nOutput: ${output}`;
-        return output;
     }
 
     /**
@@ -478,7 +433,7 @@ export class Evaluator {
      */
     private itsVariable(node: Node): Node {
 
-        let variable = STORAGE.getVariable(node.value);
+        const variable = VariableStructure.getVariable(node.value); // Get the variable
         this.addOutput = `Variable "${node.value}" called. Value: ${variable}\n`;
         return variable;
 
@@ -489,6 +444,7 @@ export class Evaluator {
      * @description Get the function arguments
      * @param {Node} node The node to get arguments 
      * @returns {Node[]} The function arguments
+     * @throws {Error} If the function does not have arguments
      */
     private getFunctionArguments(node: Node): Node[] | void {
 
@@ -529,9 +485,9 @@ export class Evaluator {
      * @name assign
      * @description Assign a variable
      * @returns {void}
+     * @throws {Error} If the function does not have arguments
      */
     private assign(name: string, value: Node): Node { // @TODO Fix this method, sometimes skipping nodes and not assigning variables
-        test({ newAssign: { name, value } })
 
         if (FUNCTIONS.isFunction(value.value)) { // Check if the value is a function
 
@@ -547,6 +503,7 @@ export class Evaluator {
         value = this.identifier(value) as Node; // Identifying the value
 
         this.debug({ name, value }, `assign call`);
+
         STORAGE.setVariable = { name, value };
         this.addOutput = `Variable "${name}" set to ${JSON.stringify(value)}\n`;
         return value;
@@ -556,6 +513,7 @@ export class Evaluator {
      * @name checkNextNode
      * @description The checkNextNode method is responsible for checking the next Node.
      * @returns {Node} The next Node.
+     * @getter
      */
     private get checkNextNode(): Node { return this.tree[this.index + 1]; }
 
@@ -568,25 +526,35 @@ export class Evaluator {
     private set addOutput(x: string) { this.output += `${x}\n`; }
 
     /**
+     * @name getSplitedNodes
+     * @description Get the splited nodes
+     * @returns {Node[]} The splited nodes
+     * @getter
+     */
+    private get getSplitedNodes(): Node[] { return this.tree.slice(this.index + 1); };
+
+    /**
+     * @name fixIndex
+     * @description Fix the index
+     * @param {Number} num The number to fix the index 
+     * @setter
+     */
+    private set fixIndex(num: number) { this.index += num; }
+
+    /**
      * @name skipNode
      * @description Skip a node
      * @returns 
      */
     private skipNode(): void {
 
-        const currentNode = this.current;
-        // const lastNode = this.tree[this.index - 1] || { type: 'undefined' };
-        const nextNode = this.checkNextNode;
+        this.debug(this.current, `skipNode call`);
 
-        this.debug(currentNode, `skipNode call`)
-        if (currentNode && currentNode.type == 'identifier') {
-
-            if (nextNode.type == 'assign' && nextNode.children![0].value == currentNode.value) this.current = this.next() as Node;
+        if (this.current && this.current.type == 'identifier') {
+            if (this.checkNextNode.type == 'assign' && this.checkNextNode.children![0].value == this.current.value) this.current = this.next() as Node;
         }
 
-        if (currentNode && !currentNode.type) this.next();
-
-        // else this.current = this.next() as Node;
+        if (this.current && !this.current.type) this.next();
 
     }
 
