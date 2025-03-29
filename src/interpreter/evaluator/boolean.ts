@@ -6,6 +6,12 @@ import { Node } from "types/Parser";
  */
 export class BooleanStructure {
 
+    /**
+     * @name evalBoolean
+     * @description Eval boolean
+     * @param {Node} condition Node value of boolean to evaluate
+     * @returns {Node} evaluated boolean, true or false
+     */
     public static evalBoolean(condition: Node): Node {
 
         if (condition.type === 'boolean') condition.value = eval(condition.value);

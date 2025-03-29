@@ -1,14 +1,17 @@
-import { Node } from '../types/Parser';
-import { STORAGE, FUNCTIONS, isDebug, debugFile } from '../index';
-import { FunctionDeclaration } from 'types/Functions';
-import { StringStructure } from './evaluator/string';
-
 import load from '../modules/loader';
 import { Lexer } from './lexer';
 import { Parser } from './parser';
+
+import { STORAGE, FUNCTIONS, isDebug, debugFile } from '../index';
+
+import { FunctionDeclaration } from 'types/Functions';
+import { Node } from 'types/Parser';
+
+import { StringStructure } from './evaluator/string';
 import { VariableStructure } from './evaluator/variables';
 import { BooleanStructure } from './evaluator/boolean';
 import { FunctionStructure } from './evaluator/function';
+import { ObjectStructure } from './evaluator/objects';
 
 const test = (x: any) => false && console.log(x);
 
@@ -78,7 +81,7 @@ export class Evaluator {
             case 'math': return this.itsMath(this.current); // Evaluating math
             case 'number': return this.evaluate(); // Returning a number
             case 'string': return this.itsString(this.current); // Returning a string
-            case 'objectCall': return this.objectCall(this.current) // Calling an object
+            case 'objectCall': return ObjectStructure.objectCall(this.current) // Calling an object
 
         }
 
@@ -108,41 +111,10 @@ export class Evaluator {
         else if (this.checkFunctionDeclarationNodes(node)) return this.itsFunction(node); // Checking if the node is a function declaration
         else if (FUNCTIONS.isFunction(node.value)) return this.itsFunction(node); // Checking if the node is a function  
         else if (node.type === 'boolean') return node; // Returning a boolean
-        else if (node.type === 'object') return this.itsObject(node); // Returning an object
-        else if (node.type === 'objectCall') return this.objectCall(node); // Calling an object
+        else if (node.type === 'object') return node; // Returning an object
+        else if (node.type === 'objectCall') return ObjectStructure.objectCall(node); // Calling an object
         else this.itsVariable(node); // Returning a variable
 
-    }
-
-    /**
-     * @name objectCall
-     * @description Call an object by key and get value
-     * @param {Node} node The node to call 
-     * @returns {Node} The object value
-     */
-    private objectCall(node: Node): Node {
-
-        if (!STORAGE.memory.has(node.children![0].value)) throw new Error(`Object ${node.children![0].value} does not exist`);
-        const object = JSON.parse(JSON.stringify(STORAGE.getVariable(node.children![0].value).children))[0];
-
-        const key = node.children![1].value;
-
-        if (!object[key]) throw new Error(`Object ${node.children![0].value} does not have key ${key}`);
-
-        const value = object[key];
-
-        return { type: value.type, value: value.value, children: value.children };
-
-    }
-
-    /**
-     * @name itsObject
-     * @description Return an object
-     * @param {Node} node The node to return 
-     * @returns {Node} The object
-     */
-    private itsObject(node: Node): Node {
-        return node;
     }
 
     /**
@@ -156,11 +128,11 @@ export class Evaluator {
         this.debug(node, 'itsCondition call');
 
         if (node.value === 'if') return this.ifCondition(node);
-        if (node.value === 'for') return this.forLoop(node);
+        if (node.value === 'for') return this.forLoop();
         
     }
 
-    private forLoop(node: Node): void {
+    private forLoop(): void {
 
         if (this.checkNextNode.type !== 'arguments') throw new Error('for requires arguments');
         const args = this.next() as Node;
@@ -210,9 +182,9 @@ export class Evaluator {
         if (!args.find((arg: Node) => arg.type == 'objectCall') && args.length !== 1) throw new Error('if requires one argument');
         if (args.find((arg: Node) => arg.type == 'objectCall') && args.length !== 2) throw new Error('if requires one argument');
 
-        if (args.find((arg: Node) => arg.type == 'objectCall')) args = [this.objectCall(args[1])];
+        if (args.find((arg: Node) => arg.type == 'objectCall')) args = [ObjectStructure.objectCall(args[1])];
 
-        const condition = this.checkBoolean(args[0]);
+        const condition = BooleanStructure.evalBoolean(args[0]);
 
         if (this.tree[this.index + 1].type !== 'braces') throw new Error('if requires braces');
         const braces = (this.next() as Node).children!;
@@ -241,14 +213,6 @@ export class Evaluator {
     }
 
     /**
-     * @name checkBolean
-     * @description Check the node value boolean
-     * @param {Node} condition Node to check boolean of it
-     * @returns {Node} The node with boolean value
-     */
-    private checkBoolean(condition: Node): Node { return BooleanStructure.evalBoolean(condition); }
-
-    /**
      * @name itsImport
      * @description Import another file
      * @param {Node} node
@@ -264,7 +228,7 @@ export class Evaluator {
         const code = load(path);
         const lexer = new Lexer(code);
         const parser = new Parser(lexer.tokens);
-        const evaluator = new Evaluator(parser.tree);
+        new Evaluator(parser.tree);
 
     }
 
@@ -278,7 +242,7 @@ export class Evaluator {
         
         this.debug(node, `itsString call`);
 
-        if (this.checkStringConstants(node)) return StringStructure.replaceVariables(node.value);
+        if (StringStructure.checkStringVariables(node.value)) return StringStructure.replaceVariables(node.value);
         return node;
 
     }
@@ -307,14 +271,6 @@ export class Evaluator {
         else return { type: 'number', value: `${output}`, children: [] };
 
     }
-
-    /**
-     * @name checkStringConstants
-     * @description Check if the string has constants
-     * @param {Node} node The node to check
-     * @returns {boolean} If the string has constants
-     */
-    private checkStringConstants(node: Node): boolean { return StringStructure.checkStringVariables(node.value); }
 
     /**
      * @name checkFunctionDeclarationNodes
