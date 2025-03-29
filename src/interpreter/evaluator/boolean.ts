@@ -1,4 +1,5 @@
 import { Node } from "types/Parser";
+import { STORAGE } from '../../index';
 
 /**
  * @name BooleanStructure
@@ -20,7 +21,10 @@ export class BooleanStructure {
             if (parseFloat(condition.value) > 0) condition.value = eval('true');
             else condition.value = eval('false');
         }
-        else throw new Error("Invalid 'if' condition");
+        else if (condition.type === 'identifier' && STORAGE.getVariable(condition.value)) {
+            return BooleanStructure.evalBoolean(STORAGE.getVariable(condition.value));
+        }
+        else throw new Error("Invalid condition");
 
         return { type: 'boolean', value: condition.value, children: [] };
 

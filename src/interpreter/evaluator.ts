@@ -73,6 +73,7 @@ export class Evaluator {
 
         this.debug(this.current, `evaluate call`)
 
+
         switch (this.current.type) {
 
             case 'condition': return this.itsCondition(this.current); // Evaluating a statement
@@ -506,6 +507,7 @@ export class Evaluator {
 
         this.debug(this.current, `skipNode call`);
 
+        if (this.current.type === 'colon') this.current = this.next() as Node;
         if (this.current && this.current.type == 'identifier') {
             if (this.checkNextNode.type == 'assign' && this.checkNextNode.children![0].value == this.current.value) this.current = this.next() as Node;
         }

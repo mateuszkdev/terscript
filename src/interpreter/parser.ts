@@ -71,6 +71,7 @@ export class Parser {
   
         /* Check for the type of token */
         if (this.current.type == 'dot' && (this.lastToken.type == 'letters' && this.checkNextToken.type == 'letters')) return { type: 'objectCall', value: '.', children: [this.lastToken, this.next()] };
+        else if (this.current.type == 'letters' && this.checkNextToken.type == 'question') return this.parseQuickCondition();
         else if (this.checkMath(this.current)) return this.parseMath();
         else if(this.current.type == 'dot' && (this.lastToken.type == 'numbers' || this.checkNextToken.type == 'letters')) return this.parseMath();
         else if (this.current.type == 'quote') return this.parseString();
@@ -83,7 +84,35 @@ export class Parser {
         else if (this.current.type == 'leftBrace') return this.parseBraces();
         else if (this.current.type == 'colon') return this.current;
         else if (this.current.type == 'comma') return this.current;
+        else if (this.current.type == 'question') return this.current;
         else return this.parse();
+
+    }
+
+    private parseQuickCondition(): Node {
+
+        this.debug(this.current, 'parseQuickCondition call')
+
+        const condition = this.current;
+
+        while (true) {
+
+
+        }
+
+        // const condition = this.current;
+        // this.next();
+        // console.log({ condition })
+        // console.log({ c: this.current, n: this.checkNextToken })
+        // const trueStatement = this.parse();
+        // console.log({ trueStatement })
+        // console.log(this.checkNextToken)
+        // if (this.checkNextToken.type !== 'colon') throw new Error('Invalid quick condition declaration. CONDITION ? TRUE : FALSE. Missing ":"');
+        // this.next();
+
+        // const falseStatement = this.parse();
+
+        // return { type: 'quickCondition', value: '', children: [condition, trueStatement as Node, falseStatement as Node] }
 
     }
 

@@ -1,3 +1,7 @@
+x = true
+
+x ? log("x is true") : log("x is false")
+
 
 /*
 To do:
